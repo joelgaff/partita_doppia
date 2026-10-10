@@ -29,8 +29,18 @@
     <%= yield :head %>
   </head>
 
-  <body class="<%= yield(:body_class) %>">
-    <% if logged_in? %>
+  <body class="<%= yield(:body_class) %><%= " native" if hotwire_native_app? %>">
+    <% if logged_in? && hotwire_native_app? %>
+      <%# The iOS app: native tabs and navigation bars around the page, so none of our own chrome. %>
+      <div class="app-shell">
+        <main class="app-main">
+          <% flash.each do |type, message| %>
+            <div class="flash flash-<%= type == "notice" ? "notice" : "alert" %>"><%= message %></div>
+          <% end %>
+          <%= yield %>
+        </main>
+      </div>
+    <% elsif logged_in? %>
       <div class="app-shell">
         <header class="app-titlebar">
           <div class="tb-brand">

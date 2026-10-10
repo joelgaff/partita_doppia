@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   root "dashboard#index"
 
+  # The iOS app: what its More tab shows, and which paths it opens as modals.
+  get "menu", to: "menu#show"
+  get "configurations/ios_v1", to: "configurations#ios_v1", defaults: { format: :json }
+
   # Built-in sign-in (local mode); in Launchpad mode these hand over to the hub.
   resource :session, only: %i[new create destroy] do
     get  :verify

@@ -1,0 +1,20 @@
+<% content_for :title, "More" %>
+<%# The iOS app's fifth tab: every section the four native tabs leave out. %>
+<nav class="menu-page" aria-label="Sections">
+  <%= nav_item "Contacts",  contacts_path,        icon: :contacts %>
+  <%= nav_item "Bills",     bills_path,           icon: :bills %>
+  <%= nav_item "Deposits",  deposits_path,        icon: :deposits %>
+  <%= nav_item "Journal",   journal_entries_path, icon: :journal %>
+  <%= nav_item "Accounts",  accounts_path,        icon: :accounts %>
+  <%= nav_item "Banking",   bank_accounts_path,   icon: :banking %>
+  <%= nav_item "Reports",   reports_path,         icon: :reports %>
+  <%= nav_item "Settings",  settings_path,        icon: :settings %>
+</nav>
+<div class="menu-session">
+  <span class="muted"><%= current_user.email %></span>
+  <% if Auth.launchpad? %>
+    <%= button_to "Sign out", "#{Auth.launchpad_base_url}/session", method: :delete, class: "btn btn-secondary", form: { style: "display:inline" } %>
+  <% else %>
+    <%= button_to "Sign out", session_path, method: :delete, class: "btn btn-secondary", form: { style: "display:inline" } %>
+  <% end %>
+</div>
