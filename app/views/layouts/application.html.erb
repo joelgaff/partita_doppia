@@ -3,7 +3,8 @@
 <html data-theme="<%= theme %>">
   <head>
     <title><%= hotwire_native_app? ? page_title : "#{page_title} · #{app_name}" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <%# Inside the app the native bars are opaque and outside the page: viewport-fit=auto keeps the page between them. %>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=<%= hotwire_native_app? ? "auto" : "cover" %>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="<%= theme == "light" ? "default" : "black-translucent" %>">
     <meta name="apple-mobile-web-app-title" content="<%= app_name %>">

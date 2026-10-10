@@ -28,6 +28,13 @@ class NativeAppTest < ActionDispatch::IntegrationTest
     assert_select ".app-statusbar", 0
   end
 
+  test "inside the app the page does not draw under the bars" do
+    get root_path, headers: { "User-Agent" => NATIVE_UA }
+    assert_select "meta[name=viewport][content*='viewport-fit=auto']"
+    get root_path
+    assert_select "meta[name=viewport][content*='viewport-fit=cover']", 1, "the web app's own tab bar still wants the full screen"
+  end
+
   test "the path configuration is public JSON naming the modal paths" do
     cookies.delete(Ee::Jwt::COOKIE_NAME.to_s)
     get "/configurations/ios_v1.json"
