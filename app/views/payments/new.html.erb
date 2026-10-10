@@ -9,7 +9,7 @@
   <p>Balance due: <strong><%= money(@document.balance_due) %></strong></p>
 </div>
 
-<%= form_with model: @payment, url: document_payments_path(@document), class: "app-form" do |f| %>
+<%= form_with model: @payment, url: document_payments_path(@document), class: "app-form", data: bridge_form_data("Record payment") do |f| %>
   <% if @payment.errors.any? %>
     <div class="form-errors">
       <ul>

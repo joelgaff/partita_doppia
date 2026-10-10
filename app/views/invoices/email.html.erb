@@ -2,7 +2,7 @@
   <h1>Email <%= @document.label.downcase %></h1>
 </header>
 
-<%= form_with url: send_email_invoice_path(@document), method: :post, class: "app-form" do |f| %>
+<%= form_with url: send_email_invoice_path(@document), method: :post, class: "app-form", data: bridge_form_data("Send email") do |f| %>
   <div class="field">
     <%= f.label :to, "Send to (email)" %>
     <%= f.email_field :to, value: @document.contact&.email, required: true %>

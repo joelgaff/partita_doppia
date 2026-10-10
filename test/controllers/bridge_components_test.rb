@@ -25,6 +25,10 @@ class BridgeComponentsTest < ActionDispatch::IntegrationTest
     assert_select "form[data-controller~='bridge--form'][data-bridge-submit-title='Update invoice']"
     get new_expense_path, headers: { "User-Agent" => NATIVE_UA }
     assert_select "form[data-controller~='bridge--form'][data-bridge-submit-title='Record expense']"
+    get new_document_payment_path(@invoice), headers: { "User-Agent" => NATIVE_UA }
+    assert_select "form[data-controller~='bridge--form'][data-bridge-submit-title='Record payment']"
+    get email_invoice_path(@invoice), headers: { "User-Agent" => NATIVE_UA }
+    assert_select "form[data-controller~='bridge--form'][data-bridge-submit-title='Send email']"
   end
 
   test "a document's overflow is a menu the app can draw natively" do
