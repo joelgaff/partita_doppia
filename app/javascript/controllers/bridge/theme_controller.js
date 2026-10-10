@@ -9,7 +9,7 @@ export default class extends BridgeComponent {
     super.connect()
     this.send("connect", { theme: this.theme })
     this.observer = new MutationObserver(() => this.send("update", { theme: this.theme }))
-    this.observer.observe(this.element, { attributes: true, attributeFilter: ["data-theme"] })
+    this.observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
   }
 
   disconnect() {
@@ -17,5 +17,5 @@ export default class extends BridgeComponent {
     super.disconnect()
   }
 
-  get theme() { return this.element.dataset.theme || "dark" }
+  get theme() { return document.documentElement.dataset.theme || "dark" }
 }

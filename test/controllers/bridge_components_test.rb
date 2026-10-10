@@ -42,7 +42,7 @@ class BridgeComponentsTest < ActionDispatch::IntegrationTest
 
   test "the page tells the app its theme, and Print offers the PDF to share" do
     get invoice_path(@invoice), headers: { "User-Agent" => NATIVE_UA }
-    assert_select "html[data-controller~='bridge--theme'][data-theme=dark]"
+    assert_select "html[data-theme=dark] body[data-controller~='bridge--theme']"
     assert_select "a[data-controller~='bridge--share'][data-bridge-url=?]", print_invoice_path(@invoice, format: :pdf)
   end
 

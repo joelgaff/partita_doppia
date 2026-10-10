@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <% theme = Current.user&.theme.presence || "dark" %>
-<html data-theme="<%= theme %>" data-controller="bridge--theme">
+<html data-theme="<%= theme %>">
   <head>
     <title><%= hotwire_native_app? ? page_title : "#{page_title} · #{app_name}" %></title>
     <%# Inside the app the native bars are opaque and outside the page: viewport-fit=auto keeps the page between them. %>
@@ -30,7 +30,7 @@
     <%= yield :head %>
   </head>
 
-  <body class="<%= yield(:body_class) %><%= " native" if hotwire_native_app? %>">
+  <body class="<%= yield(:body_class) %><%= " native" if hotwire_native_app? %>" data-controller="bridge--theme">
     <% if logged_in? && hotwire_native_app? %>
       <%# The iOS app: native tabs and navigation bars around the page, so none of our own chrome. %>
       <div class="app-shell">
