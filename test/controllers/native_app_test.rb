@@ -46,6 +46,15 @@ class NativeAppTest < ActionDispatch::IntegrationTest
     assert_includes modal["patterns"], "/new$"
     assert_includes modal["patterns"], "/edit$"
     assert_equal false, modal.dig("properties", "pull_to_refresh_enabled")
+    native = config["rules"].find { |r| r.dig("properties", "view_controller") == "app_settings" }
+    assert_includes native["patterns"], "/app/settings$", "the app's own settings screen is native"
+  end
+
+  test "the More page offers the app's own settings, in the app only" do
+    get menu_path, headers: { "User-Agent" => NATIVE_UA }
+    assert_select "a[href='/app/settings']", text: "App settings"
+    get menu_path
+    assert_select "a[href='/app/settings']", 0
   end
 
   test "the More page lists the sections the tabs do not carry, and a way to sign out" do

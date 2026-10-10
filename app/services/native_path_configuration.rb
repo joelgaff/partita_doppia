@@ -2,14 +2,16 @@
 # this as its fallback (PartitaDoppia/Resources/path-configuration.json); keep
 # the two in step.
 module NativePathConfiguration
-  MODAL_PATHS = %w[/new$ /edit$ /copy$ /email$ /payments/new$].freeze
+  MODAL_PATHS  = %w[/new$ /edit$ /copy$ /email$ /payments/new$].freeze
+  NATIVE_PATHS = { "/app/settings$" => "app_settings" }.freeze   # screens the app draws itself
 
   def self.ios_v1
     {
       settings: {},
       rules: [
         { patterns: [ ".*" ], properties: { context: "default", pull_to_refresh_enabled: true } },
-        { patterns: MODAL_PATHS, properties: { context: "modal", pull_to_refresh_enabled: false } }
+        { patterns: MODAL_PATHS, properties: { context: "modal", pull_to_refresh_enabled: false } },
+        *NATIVE_PATHS.map { |pattern, screen| { patterns: [ pattern ], properties: { view_controller: screen, pull_to_refresh_enabled: false } } }
       ]
     }
   end
