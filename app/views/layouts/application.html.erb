@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <% theme = Current.user&.theme.presence || "dark" %>
-<html data-theme="<%= theme %>">
+<html data-theme="<%= theme %>" data-controller="bridge--theme">
   <head>
     <title><%= hotwire_native_app? ? page_title : "#{page_title} · #{app_name}" %></title>
     <%# Inside the app the native bars are opaque and outside the page: viewport-fit=auto keeps the page between them. %>

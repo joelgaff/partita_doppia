@@ -1,4 +1,4 @@
-<%= form_with model: document, **document_form_options(document), class: "app-form app-form-wide" do |f| %>
+<%= form_with model: document, **document_form_options(document), class: "app-form app-form-wide", data: bridge_form_data(document.draft? ? "Save draft" : "Update bill") do |f| %>
   <%= render "documents/errors", document: document %>
   <%= f.hidden_field :copied_from_id if document.copied_from_id.present? %>
 

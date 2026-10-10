@@ -1,16 +1,19 @@
 <%# The less-used actions. Rendered twice: inline in the bar for wide screens,
-    inside the ··· sheet for phones; CSS shows one copy per width. %>
+    inside the ··· sheet for phones; CSS shows one copy per width. The sheet copy
+    (bridge: true) also feeds the app's native menu: each item names itself. %>
+<% item = ->(title, destructive: false) { local_assigns[:bridge] ? { "bridge--menu-target": "item", bridge_title: title, bridge_destructive: (true if destructive) }.compact : {} } %>
 <% if document.invoice? %>
-  <%= link_to "Print / PDF", print_invoice_path(document), class: "btn btn-secondary" %>
-  <%= link_to "Email", email_invoice_path(document), class: "btn btn-secondary" unless document.draft? %>
-  <%= button_to "Mark as unsent", mark_unsent_invoice_path(document), class: "btn btn-secondary", form: { class: "inline-form" } if document.invoice.sent? %>
+  <%= link_to "Print / PDF", print_invoice_path(document), class: "btn btn-secondary",
+        data: item.("Print / PDF").merge(controller: "bridge--share", action: "click->bridge--share#share", bridge_url: print_invoice_path(document, format: :pdf)) %>
+  <%= link_to "Email", email_invoice_path(document), class: "btn btn-secondary", data: item.("Email") unless document.draft? %>
+  <%= button_to "Mark as unsent", mark_unsent_invoice_path(document), class: "btn btn-secondary", form: { class: "inline-form" }, data: item.("Mark as unsent") if document.invoice.sent? %>
 <% end %>
-<%= link_to "Copy", copy_document_path_for(document), class: "btn btn-secondary" if document.copyable? %>
+<%= link_to "Copy", copy_document_path_for(document), class: "btn btn-secondary", data: item.("Copy") if document.copyable? %>
 <% unless document.voided? || document.draft? %>
-  <%= button_to "Void", void_document_path_for(document), class: "btn btn-secondary",
+  <%= button_to "Void", void_document_path_for(document), class: "btn btn-secondary", data: item.("Void", destructive: true),
         form: { class: "inline-form", data: { turbo_confirm: void_confirm_message(document) } } %>
 <% end %>
 <% if document.deletable? %>
-  <%= button_to "Delete", delete_document_path_for(document), method: :delete, class: "btn btn-secondary btn-danger",
+  <%= button_to "Delete", delete_document_path_for(document), method: :delete, class: "btn btn-secondary btn-danger", data: item.("Delete", destructive: true),
         form: { class: "inline-form", data: { turbo_confirm: "Delete #{document.label} for good? Its lines, postings, history and attachments go with it. There is no undo." } } %>
 <% end %>

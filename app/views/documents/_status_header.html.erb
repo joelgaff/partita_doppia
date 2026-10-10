@@ -1,7 +1,7 @@
 <%# Badge plus the actions a document offers. Replaced over turbo_stream after approve or void.
     On wide screens everything sits inline; on a phone the bar is pinned above the tabs and
     the less-used actions live behind ···. %>
-<%= tag.div id: dom_id(document, :status), class: "status-actions", data: { controller: "sheet", action: "keydown@window->sheet#keydown" } do %>
+<%= tag.div id: dom_id(document, :status), class: "status-actions", data: { controller: "sheet bridge--menu", action: "keydown@window->sheet#keydown" } do %>
   <%= status_badge(document.status) %>
   <% if document.invoice? && document.invoice.sent? %>
     <span class="sent-mark">✓ Sent <%= document.invoice.sent_at.strftime("%b %-d, %Y") %></span>
@@ -26,6 +26,6 @@
   <div class="sheet-dimmer" data-sheet-target="dimmer" data-action="click->sheet#close" hidden></div>
   <div class="sheet-panel action-sheet" data-sheet-target="panel" hidden>
     <div class="sheet-handle" aria-hidden="true"></div>
-    <%= render "documents/action_overflow", document: document %>
+    <%= render "documents/action_overflow", document: document, bridge: true %>
   </div>
 <% end %>

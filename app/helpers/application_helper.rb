@@ -48,6 +48,11 @@ module ApplicationHelper
   def delete_document_path_for(document) = public_send("#{document.documentable_name}_path", document)
   def documents_path_for(document)     = public_send("#{document.documentable_name.pluralize}_path")
 
+  # The data attributes a document form carries for the app: its submit's title moves to the navigation bar.
+  def bridge_form_data(submit_title, **more)
+    { controller: [ "bridge--form", more.delete(:controller) ].compact.join(" "), bridge_submit_title: submit_title, **more }
+  end
+
   # The form target for a new or existing document of its type.
   def document_form_options(document)
     document.persisted? ? { url: document_path_for(document), method: :patch } : { url: documents_path_for(document), method: :post }
