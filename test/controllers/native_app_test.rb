@@ -55,4 +55,19 @@ class NativeAppTest < ActionDispatch::IntegrationTest
     get root_path, headers: { "User-Agent" => NATIVE_UA }
     assert_match(/@hotwired\/hotwire-native-bridge/, response.body)
   end
+
+  test "each page has a title of its own: the app's navigation bar shows it, the browser tab adds the app name" do
+    @ar = Plutus::Asset.create!(tenant: @org, name: "AR", code: "1200")
+    @sales = Plutus::Revenue.create!(tenant: @org, name: "Sales", code: "4100")
+    @org.settings.update!(receivable_account: @ar)
+    inv = create_invoice(@org, client_name: "Acme", amount: 100, receivable: @ar, revenue: @sales)
+
+    { invoices_path => "Invoices", invoice_path(inv) => inv.label, new_invoice_path => "New invoice",
+      bank_transactions_path => "Reconcile", root_path => "Home", menu_path => "More", settings_path => "Settings" }.each do |path, title|
+      get path, headers: { "User-Agent" => NATIVE_UA }
+      assert_select "title", text: title, count: 1
+      get path
+      assert_select "title", text: "#{title} · Partita Doppia", count: 1
+    end
+  end
 end

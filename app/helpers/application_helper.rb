@@ -78,6 +78,27 @@ module ApplicationHelper
     end)
   end
 
+  # The page's own name: the app's navigation bar shows it, the browser tab adds the app name.
+  # A page may set it (content_for :title); otherwise it comes from what the page is about.
+  def page_title
+    content_for(:title).presence || derived_page_title
+  end
+
+  SECTION_TITLES = { "dashboard" => "Home", "bank_transactions" => "Reconcile", "journal_entries" => "Journal",
+                     "menu" => "More", "bank_accounts" => "Banking", "sessions" => "Sign in", "setups" => "Set up" }.freeze
+
+  def derived_page_title
+    section = SECTION_TITLES.fetch(controller_name, controller_name.humanize)
+    record  = [ @document, @contact, @bank_account, @bank_rule, @recurring_invoice, @tracking_category, @tax_rate ].compact.first
+    label   = -> { record&.persisted? && (record.try(:label) || record.try(:name) || record.try(:display_name)) }   # only once a page is about a saved record
+    case action_name
+    when "index"         then section
+    when "new", "create" then "New #{section.singularize.downcase}"
+    when "edit", "update" then label.call.presence&.then { |l| "Edit #{l}" } || "Edit #{section.singularize.downcase}"
+    else label.call.presence || section
+    end
+  end
+
   # Account and tracking chips on a reconcile card.
   def coding_chips(coding)
     return if coding.nil? || !coding.any?

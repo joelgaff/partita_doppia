@@ -2,7 +2,7 @@
 <% theme = Current.user&.theme.presence || "dark" %>
 <html data-theme="<%= theme %>">
   <head>
-    <title><%= content_for(:title) || app_name %></title>
+    <title><%= hotwire_native_app? ? page_title : "#{page_title} · #{app_name}" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="<%= theme == "light" ? "default" : "black-translucent" %>">

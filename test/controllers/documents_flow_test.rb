@@ -156,7 +156,7 @@ class BrandingTest < ActionDispatch::IntegrationTest
     org = organizations(:one)
     sign_in_as_launchpad_user(org)
     get root_path
-    assert_select "title", text: "Partita Doppia"
+    assert_select "title", text: /Partita Doppia/, count: 1
     assert_select "meta[name=application-name][content=?]", "Partita Doppia"
     assert_select ".tb-name", text: "Partita Doppia"
     assert_select ".nav-footer strong", text: "Partita Doppia"
