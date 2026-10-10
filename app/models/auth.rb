@@ -23,6 +23,12 @@ module Auth
     def launchpad_issuer        = launchpad_settings&.dig(:issuer)
     def launchpad_cookie_domain = Rails.application.config.x.jwt_cookie_domain.presence || launchpad_settings&.dig(:cookie_domain)
 
+    # Development only: DEV_LOGIN_CODE pins the sign-in code, so a simulator can be driven
+    # through sign-in without reading mail. Any other environment ignores it.
+    def development_login_code
+      ENV["DEV_LOGIN_CODE"].presence if Rails.env.development?
+    end
+
     # Where this app is served, for allowed hosts and links in email.
     def app_host = Rails.application.credentials.dig(:app, :host).presence || ENV["APP_HOST"].presence
 

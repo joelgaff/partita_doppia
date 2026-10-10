@@ -2,7 +2,7 @@
 # this as its fallback (PartitaDoppia/Resources/path-configuration.json); keep
 # the two in step.
 module NativePathConfiguration
-  MODAL_PATHS = %w[/new$ /edit$ /copy$ /email$ /payments/new$ /session/new /session/verify /setup].freeze
+  MODAL_PATHS = %w[/new$ /edit$ /copy$ /email$ /payments/new$].freeze
 
   def self.ios_v1
     {

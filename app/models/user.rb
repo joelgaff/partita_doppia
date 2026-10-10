@@ -32,9 +32,10 @@ class User < ApplicationRecord
   # Generate a 6-digit code, store its digest, return the plaintext to email.
   # Raises when the address has asked too often; the caller shows the same
   # page either way so nothing leaks.
-  def issue_login_code!
+  # code: given only by development, to pin the code (see Auth.development_login_code).
+  def issue_login_code!(code: nil)
     raise TooManyRequests if login_code_throttled?
-    code  = format("%06d", SecureRandom.random_number(1_000_000))
+    code  = code.presence || format("%06d", SecureRandom.random_number(1_000_000))
     sends = login_code_sent_at && login_code_sent_at > SEND_WINDOW.ago ? login_code_sends + 1 : 1
     update!(
       login_code_digest:     BCrypt::Password.create(code),

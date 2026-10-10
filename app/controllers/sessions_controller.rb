@@ -13,7 +13,7 @@ class SessionsController < ApplicationController
     email = User.normalize_value_for(:email_address, params[:email])
     if (user = User.local.find_by(email_address: email))
       begin
-        code = user.issue_login_code!
+        code = user.issue_login_code!(code: Auth.development_login_code)
         LoginMailer.code(user, code).deliver_later
       rescue User::TooManyRequests
         # Silently: the page still moves on, and the last code they were sent remains valid.
