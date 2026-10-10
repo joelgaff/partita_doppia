@@ -88,6 +88,17 @@
   Reconcile's Create panel and `Memory` carry `billable_to` too. Gross method: the cost stays an
   expense, the invoice line is revenue.
 
+## The iOS app (Hotwire Native)
+- Lives in `partita_doppia_ios`, cloned beside this one. Inside the app (`hotwire_native_app?`,
+  turbo-rails' user-agent check) the layout drops its own chrome, serves `viewport-fit=auto`, and
+  hides what a native component draws (`[data-bridge-components~=…]` rules in the stylesheet).
+  `/configurations/ios_v1.json` (`NativePathConfiguration`) names modal paths and native screens;
+  keep it in step with the app's bundled `path-configuration.json`. `/menu` is the app's More
+  tab. Bridge Stimulus controllers live in `app/javascript/controllers/bridge/` (`form`, `button`,
+  `menu`, `share`, `theme`) on `@hotwired/hotwire-native-bridge`, vendored under `vendor/javascript`.
+  Every page has a `page_title` (the app's navigation bar shows it). `DEV_LOGIN_CODE` pins the
+  sign-in code in development only, for driving the app in a simulator.
+
 ## Tracking categories (Xero-style)
 - `TrackingCategory` → `TrackingOption`; anything `Trackable` (`LineItem`, `JournalLine`,
   `BankRule`) holds one `TrackingSelection` per category. At most two categories are active,
