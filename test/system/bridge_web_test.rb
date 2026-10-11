@@ -24,7 +24,13 @@ class BridgeWebTest < ApplicationSystemTestCase
     @org.settings.update!(receivable_account: @ar)
     @invoice = create_invoice(@org, client_name: "Acme", amount: 100, receivable: @ar, revenue: @sales)
     sign_in_as_launchpad_user(@org)
+    @browser_ua = page.evaluate_script("navigator.userAgent")
     page.driver.browser.execute_cdp("Network.setUserAgentOverride", userAgent: NATIVE_UA)
+  end
+
+  # The browser outlives the test: put its own user agent back for whatever runs next.
+  teardown do
+    page.driver.browser.execute_cdp("Network.setUserAgentOverride", userAgent: @browser_ua) if @browser_ua
   end
 
   def messages
