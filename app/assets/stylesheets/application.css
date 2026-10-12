@@ -1283,7 +1283,8 @@ body.native .app-shell { display: block; height: auto; min-height: 100dvh; overf
 body.native .app-main  { padding: 12px 16px 24px; overflow: visible; }
 body.native .page-header h1 { display: none; }   /* the navigation bar carries the title */
 body.native .back-link { display: none; }         /* the navigation bar has the back button */
-body.native .page-header { margin-top: 0; padding-top: 0; }
+body.native .page-header { margin: 0 0 12px; padding: 0; border: 0; }
+body.native .page-header:has(> h1:only-child) { display: none; }   /* nothing left to show */
 /* The app's bars are opaque and outside the page, so pinned bars sit at the page's own bottom edge. */
 body.native .action-bar, body.native .app-form .form-actions { bottom: env(safe-area-inset-bottom, 0px); }
 body.native .page-header .page-primary { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }

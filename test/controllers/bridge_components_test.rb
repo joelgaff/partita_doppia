@@ -29,6 +29,11 @@ class BridgeComponentsTest < ActionDispatch::IntegrationTest
     assert_select "form[data-controller~='bridge--form'][data-bridge-submit-title='Record payment']"
     get email_invoice_path(@invoice), headers: { "User-Agent" => NATIVE_UA }
     assert_select "form[data-controller~='bridge--form'][data-bridge-submit-title='Send email']"
+    { new_bank_rule_path => "Add rule", new_contact_path => "Create contact", new_recurring_invoice_path => "Create recurring invoice",
+      new_tax_rate_path => "Create tax rate", new_tracking_category_path => "Add category", new_bank_account_path => "Add bank account" }.each do |path, title|
+      get path, headers: { "User-Agent" => NATIVE_UA }
+      assert_select "form[data-controller~='bridge--form'][data-bridge-submit-title=?]", title, 1, "#{path} names its submit"
+    end
   end
 
   test "a document's overflow is a menu the app can draw natively" do

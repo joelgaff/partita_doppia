@@ -1,4 +1,4 @@
-<%= form_with model: tax_rate, class: "app-form" do |f| %>
+<%= form_with model: tax_rate, class: "app-form", data: bridge_form_data(tax_rate.new_record? ? "Create tax rate" : "Update tax rate") do |f| %>
   <% if tax_rate.errors.any? %>
     <div class="form-errors">
       <ul><% tax_rate.errors.full_messages.each do |m| %><li><%= m %></li><% end %></ul>

@@ -13,7 +13,7 @@ class TrackingPagesTest < ActionDispatch::IntegrationTest
     get tracking_categories_path
     assert_response :success
     get new_tracking_category_path
-    assert_select "[data-controller=nested-rows] template", count: 1
+    assert_select "[data-controller~=nested-rows] template", count: 1
     assert_select "button[data-action='nested-rows#add']", text: "+ Add option"
     post tracking_categories_path, params: { tracking_category: { name: "Event Year", active: "1", options_attributes: { "0" => { name: "2026", active: "1" }, "1" => { name: "", active: "1" } } } }
     assert_redirected_to tracking_categories_path
