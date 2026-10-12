@@ -960,6 +960,11 @@ input[type="file"]::file-selector-button:hover { background: rgba(41, 74, 120, 0
   .data-table { display: block; overflow-x: auto; white-space: nowrap; }
   .data-table thead { display: table-header-group; }
   .data-table tbody { display: table-row-group; }
+  /* A statement (code, name, amount) wraps a long name instead; the amount stays on screen. */
+  .data-table.statement { display: table; table-layout: fixed; width: 100%; white-space: normal; }
+  .data-table.statement td:first-child { width: 48px; white-space: nowrap; }
+  .data-table.statement td:nth-child(2) { overflow-wrap: anywhere; }
+  .data-table.statement td.num { width: 110px; white-space: nowrap; }
   .data-table tfoot { display: table-footer-group; }
   .data-table tr    { display: table-row; }
   .data-table td.num, .data-table th.num { padding-left: 16px; }

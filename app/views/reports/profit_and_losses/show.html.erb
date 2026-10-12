@@ -7,7 +7,7 @@
 
 <section class="account-group">
   <h2>Revenue</h2>
-  <table class="data-table">
+  <table class="data-table statement">
     <tbody>
       <% @report.revenue_rows.each do |row| %>
         <tr>
@@ -26,7 +26,7 @@
 
 <section class="account-group">
   <h2>Expenses</h2>
-  <table class="data-table">
+  <table class="data-table statement">
     <tbody>
       <% @report.expense_rows.each do |row| %>
         <tr>
@@ -44,7 +44,7 @@
 </section>
 
 <section class="account-group">
-  <table class="data-table">
+  <table class="data-table statement">
     <tbody>
       <tr class="grand-total">
         <td>Net income</td>

@@ -14,7 +14,7 @@
 <div class="report-columns">
   <section class="account-group">
     <h2>Assets</h2>
-    <table class="data-table">
+    <table class="data-table statement">
       <tbody>
         <% @report.asset_rows.each do |r| %>
           <tr>
@@ -34,7 +34,7 @@
   <div>
     <section class="account-group">
       <h2>Liabilities</h2>
-      <table class="data-table">
+      <table class="data-table statement">
         <tbody>
           <% @report.liability_rows.each do |r| %>
             <tr>
@@ -53,7 +53,7 @@
 
     <section class="account-group">
       <h2>Equity</h2>
-      <table class="data-table">
+      <table class="data-table statement">
         <tbody>
           <% @report.equity_rows.each do |r| %>
             <tr>
