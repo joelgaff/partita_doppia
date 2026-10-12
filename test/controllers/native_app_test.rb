@@ -79,7 +79,11 @@ class NativeAppTest < ActionDispatch::IntegrationTest
     inv = create_invoice(@org, client_name: "Acme", amount: 100, receivable: @ar, revenue: @sales)
 
     { invoices_path => "Invoices", invoice_path(inv) => inv.label, new_invoice_path => "New invoice",
-      bank_transactions_path => "Reconcile", root_path => "Home", menu_path => "More", settings_path => "Settings" }.each do |path, title|
+      bank_transactions_path => "Reconcile", root_path => "Home", menu_path => "More", settings_path => "Settings",
+      "/reports/profit_and_loss" => "Profit and loss", "/reports/balance_sheet" => "Balance sheet", "/reports/trial_balance" => "Trial balance",
+      "/reports/general_ledger" => "General ledger", "/reports/accounts_receivable_aging" => "Receivables aging",
+      "/reports/accounts_payable_aging" => "Payables aging", "/journal_entries/new" => "New journal entry",
+      "/recurring_invoices/new" => "New recurring invoice", "/settings/bank_feed" => "Bank feed", "/settings/xero" => "Xero" }.each do |path, title|
       get path, headers: { "User-Agent" => NATIVE_UA }
       assert_select "title", text: title, count: 1
       get path

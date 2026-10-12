@@ -90,16 +90,23 @@ module ApplicationHelper
   end
 
   SECTION_TITLES = { "dashboard" => "Home", "bank_transactions" => "Reconcile", "journal_entries" => "Journal",
-                     "menu" => "More", "bank_accounts" => "Banking", "sessions" => "Sign in", "setups" => "Set up" }.freeze
+                     "menu" => "More", "bank_accounts" => "Banking", "sessions" => "Sign in", "setups" => "Set up",
+                     "bank_feeds" => "Bank feed", "xero_connections" => "Xero",
+                     "profit_and_losses" => "Profit and loss", "balance_sheets" => "Balance sheet", "trial_balances" => "Trial balance",
+                     "general_ledgers" => "General ledger", "accounts_receivable_agings" => "Receivables aging",
+                     "accounts_payable_agings" => "Payables aging", "profit_and_loss_by_trackings" => "Profit and loss by tracking" }.freeze
+  # What one of a section is called, where the plural's singular would mislead ("New journal").
+  SECTION_NOUNS  = { "journal_entries" => "journal entry", "bank_transactions" => "bank line", "bank_accounts" => "bank account" }.freeze
 
   def derived_page_title
     section = SECTION_TITLES.fetch(controller_name, controller_name.humanize)
+    noun    = SECTION_NOUNS.fetch(controller_name) { section.singularize.downcase }
     record  = [ @document, @contact, @bank_account, @bank_rule, @recurring_invoice, @tracking_category, @tax_rate ].compact.first
     label   = -> { record&.persisted? && (record.try(:label) || record.try(:name) || record.try(:display_name)) }   # only once a page is about a saved record
     case action_name
     when "index"         then section
-    when "new", "create" then "New #{section.singularize.downcase}"
-    when "edit", "update" then label.call.presence&.then { |l| "Edit #{l}" } || "Edit #{section.singularize.downcase}"
+    when "new", "create" then "New #{noun}"
+    when "edit", "update" then label.call.presence&.then { |l| "Edit #{l}" } || "Edit #{noun}"
     else label.call.presence || section
     end
   end

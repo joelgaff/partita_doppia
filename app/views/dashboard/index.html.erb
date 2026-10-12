@@ -35,7 +35,7 @@
       <div class="kpi-value">$<%= number_with_precision(balance, precision: 2, delimiter: ",") %></div>
       <div class="kpi-source">
         <% if account %>
-          <code><%= account.code %></code> <%= account.name %>
+          <% if account.code.present? %><code><%= account.code %></code> <% end %><%= account.name %>
         <% else %>
           <span class="muted">No account linked</span>
         <% end %>
