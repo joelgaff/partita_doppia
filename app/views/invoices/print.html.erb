@@ -116,3 +116,9 @@
   <% end %>
 </table>
 </div>
+
+<% if (lines = @document.organization.settings.mailing_address_lines).any? %>
+  <p class="payment-instructions" style="margin-top:28px;font-size:12px;color:var(--paper-dim);">
+    <%= @document.organization.settings.payment_instructions_lead %> <%= safe_join(lines, tag.br) %>
+  </p>
+<% end %>

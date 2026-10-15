@@ -64,7 +64,7 @@ class DocumentEvent < ApplicationRecord
     when "payment_recorded", "payment_removed"
       [ [ money(d["amount"]), d["bank_account"], (d["paid_on"] && "on #{d['paid_on']}"), (d["via"] == "reconcile" ? "via reconcile" : nil) ].compact.join(" · ") ]
     when "emailed"
-      [ "To #{d['to']}", ("Subject: #{d['subject']}" if d["subject"].present?), ("PDF attached" if d["pdf"]) ].compact
+      [ "To #{d['to']}", ("copy to #{d['copy_to']}" if d["copy_to"].present?), ("Subject: #{d['subject']}" if d["subject"].present?), ("PDF attached" if d["pdf"]) ].compact
     when "matched", "unmatched"
       [ [ d["bank_account"], d["posted_on"], (d["amount"] && money(d["amount"])), d["description"] ].compact_blank.join(" · ") ]
     when "note"

@@ -20,6 +20,9 @@
 
 <%= render "documents/line_items", document: @document %>
 <%= render "documents/payments", document: @document %>
+<% if (lines = @document.organization.settings.mailing_address_lines).any? %>
+  <p class="payment-instructions muted" style="margin-top:12px;font-size:12px;"><%= @document.organization.settings.payment_instructions_lead %> <%= lines.join(", ") %></p>
+<% end %>
 <%= render "documents/attachments", document: @document %>
 
 <%= render "documents/history", document: @document %>

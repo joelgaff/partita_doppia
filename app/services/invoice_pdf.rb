@@ -24,6 +24,7 @@ class InvoicePdf
       parties(pdf)
       lines(pdf)
       totals(pdf)
+      remittance(pdf)
       footer(pdf)
     end.render
   end
@@ -38,6 +39,13 @@ class InvoicePdf
       "Due #{fmt_date @invoice.due_date}",
       ("Reference #{@document.reference}" if @document.reference.present?),
       ("Account no. #{@document.contact.account_number}" if @document.contact&.account_number.present?) ].compact
+  end
+
+  # "Make payments to … and send to:" with the address, or nil when Settings has no address.
+  def payment_instructions
+    lines = @org.settings.mailing_address_lines
+    return nil if lines.empty?
+    ([ "#{@org.settings.payment_instructions_lead}:" ] + lines).join("\n")
   end
 
   private
@@ -113,6 +121,14 @@ class InvoicePdf
         end
       end
     end
+  end
+
+  def remittance(pdf)
+    text = payment_instructions or return
+    pdf.move_down 18
+    pdf.fill_color DIM
+    pdf.text text, size: 9, leading: 2
+    pdf.fill_color INK
   end
 
   def footer(pdf)

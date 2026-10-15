@@ -25,9 +25,15 @@ class SettingsController < ApplicationController
 
   # The name mail goes out under and where replies land. The address itself is the operator's.
   def emailing
-    save_settings(params.require(:organization_settings).permit(:email_from_name, :email_reply_to), what: "Email settings",
-                  notice: ->(s) { "Email will go out as #{s.email_sender_name}#{s.email_reply_to ? ", replies to #{s.email_reply_to}" : ''}." },
-                  plain: { "Email reply to" => "reply-to" })
+    save_settings(params.require(:organization_settings).permit(:email_from_name, :email_reply_to, :email_copy_to), what: "Email settings",
+                  notice: ->(s) { "Email will go out as #{s.email_sender_name}#{s.email_reply_to ? ", replies to #{s.email_reply_to}" : ''}#{s.email_copy_to ? ", copies to #{s.email_copy_to}" : ''}." },
+                  plain: { "Email reply to" => "reply-to", "Email copy to" => "the copy-to address" })
+  end
+
+  # Where payments are posted: printed on invoices as "make payments to … and send to …".
+  def mailing
+    save_settings(params.require(:organization_settings).permit(:mailing_address), what: "Mailing address",
+                  notice: ->(s) { s.mailing_address ? "Invoices will say to send payments to #{s.mailing_address_lines.join(', ')}." : "Invoices will not carry a mailing address." })
   end
 
   # Invoice prefix and next number. A blank next number means "follow the invoices".

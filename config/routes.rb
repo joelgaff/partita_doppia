@@ -90,6 +90,7 @@ Rails.application.routes.draw do
     patch :invoicing
     patch :billing
     patch :emailing
+    patch :mailing
     patch :appearance
     patch :organization
     patch :profile

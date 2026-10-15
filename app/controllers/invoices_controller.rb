@@ -15,10 +15,12 @@ class InvoicesController < DocumentsController
     subject = params[:subject].presence
     body    = params[:body].presence
 
-    InvoiceMailer.send_invoice(@document, to: to, subject: subject, body: body).deliver_later
-    @document.record_event!(:emailed, to: to, subject: subject || InvoiceMailer.default_subject(@document), pdf: true)
+    copy_to = params[:copy_to].to_s.strip.presence if params[:copy_to_me].present?
+
+    InvoiceMailer.send_invoice(@document, to: to, subject: subject, body: body, bcc: copy_to).deliver_later
+    @document.record_event!(:emailed, to: to, subject: subject || InvoiceMailer.default_subject(@document), pdf: true, copy_to: copy_to)
     @document.invoice.mark_sent!(quietly: true)
-    redirect_to invoice_path(@document), notice: "Invoice emailed to #{to} with the PDF attached."
+    redirect_to invoice_path(@document), notice: "Invoice emailed to #{to}#{copy_to ? ", with a copy to #{copy_to}," : ''} with the PDF attached."
   end
 
   # Sent some other way than email from here: by hand, by post, from another system.

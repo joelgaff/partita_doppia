@@ -10,12 +10,17 @@ class OrganizationSettings < ApplicationRecord
   NUMBER_WIDTH = 4   # INV-0001; the digits grow past four on their own
 
   normalizes :invoice_prefix, with: ->(p) { p.to_s.strip }
-  normalizes :email_from_name, :email_reply_to, with: ->(v) { v.to_s.strip.presence }
-  validates :email_reply_to, format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be an email address" }, allow_nil: true
+  normalizes :email_from_name, :email_reply_to, :email_copy_to, with: ->(v) { v.to_s.strip.presence }
+  normalizes :mailing_address, with: ->(v) { v.to_s.lines.map(&:strip).join("\n").strip.presence }
+  validates :email_reply_to, :email_copy_to, format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be an email address" }, allow_nil: true
   validates :email_from_name, length: { maximum: 80 }
 
   # The name mail goes out under: what was set, else the organisation itself.
   def email_sender_name = email_from_name.presence || organization.name
+
+  # The mailing address, a line per line, and the sentence invoices put in front of it.
+  def mailing_address_lines = mailing_address.to_s.lines.map(&:strip).compact_blank
+  def payment_instructions_lead = "Make payments to #{organization.name} and send to"
   validates :invoice_next_number, numericality: { only_integer: true, greater_than_or_equal_to: 1 }, allow_nil: true
   validate  :control_accounts_stay_set
   validate  :billable_income_is_revenue

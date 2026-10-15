@@ -12,6 +12,14 @@
     <%= f.text_field :subject, value: "Invoice #{@document.invoice.number} from #{@document.organization.name}" %>
   </div>
   <p class="muted" style="font-size:13px;margin:0 0 16px;">The invoice is attached as a PDF (<%= link_to InvoicePdf.filename(@document), print_invoice_path(@document, format: :pdf), target: "_blank" %>) and summarised in the body.</p>
+  <% copy_to = @document.organization.settings.email_copy_to %>
+  <div class="field">
+    <label style="display:flex;gap:8px;align-items:center;">
+      <%= check_box_tag :copy_to_me, "1", copy_to.present? %> Send a copy to
+    </label>
+    <%= email_field_tag :copy_to, copy_to, placeholder: "your address", style: "max-width:320px;", "aria-label": "Copy to" %>
+    <span class="field-help">Sent as a blind copy. Set the default under Settings → Email.</span>
+  </div>
   <div class="field">
     <%= f.label :body, "Personal note (optional)" %>
     <%= f.text_area :body, rows: 5, placeholder: "Thanks for your business…" %>
