@@ -1,0 +1,36 @@
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="width:80px">Code</th>
+      <th>Name</th>
+      <% if local_assigns[:show_type] %><th>Type</th><% end %>
+      <th>Description</th>
+      <th class="num">Balance</th>
+      <th class="num"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% accounts.each do |account| %>
+      <tr id="<%= dom_id(account) %>" class="<%= 'muted' if account.archived? %>">
+        <td data-label="Code"><%= account.code || content_tag(:span, "—", class: "muted") %></td>
+        <td data-label="Name">
+          <%= account.name %>
+          <% if account.bank_account %>
+            <%= link_to account.bank_account.kind_label, edit_bank_account_path(account.bank_account), class: "badge badge-open", style: "margin-left:6px;text-decoration:none;" %>
+          <% end %>
+        </td>
+        <% if local_assigns[:show_type] %><td data-label="Type"><%= account.type.demodulize %></td><% end %>
+        <td data-label="Description" class="muted"><%= account.description %></td>
+        <td data-label="Balance" class="num">$<%= number_with_precision(account.balance, precision: 2, delimiter: ",") %></td>
+        <td class="num">
+          <% if account.archived? %>
+            <%= button_to "Restore", restore_account_path(account), class: "btn btn-secondary", form: { class: "inline-form", data: { turbo_stream: true } } %>
+          <% elsif account.bank_account.nil? %>
+            <%# A bank account's ledger side is archived from Banking, through the badge beside its name. %>
+            <%= button_to "Archive", archive_account_path(account), class: "btn btn-secondary", form: { class: "inline-form", data: { turbo_stream: true } } %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

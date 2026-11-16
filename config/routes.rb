@@ -39,7 +39,9 @@ Rails.application.routes.draw do
     resources :notes,    only: :create, controller: "document_notes"
   end
   resources :payments, only: :destroy
-  resources :accounts, only: %i[index]
+  resources :accounts, only: %i[index new create] do
+    member { post :archive; post :restore }
+  end
   resources :bank_accounts, except: :destroy do
     member do
       post :archive

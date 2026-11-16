@@ -8,6 +8,7 @@ module AccountArchiving
   included do
     scope :active,   -> { where(archived_at: nil) }
     scope :archived, -> { where.not(archived_at: nil) }
+    validates :code, uniqueness: { scope: :tenant_id }, allow_nil: true   # the index says so too; this says it kindly
   end
 
   def archived? = archived_at.present?

@@ -46,6 +46,7 @@ class PhoneLayoutTest < ApplicationSystemTestCase
     "contact"              => "/contacts/%{contact}",
     "new contact"          => "/contacts/new",
     "accounts"             => "/accounts",
+    "new account"          => "/accounts/new",
     "banking"              => "/bank_accounts",
     "bank account"         => "/bank_accounts/%{bank}",
     "reconcile"            => "/bank_transactions",

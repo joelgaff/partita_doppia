@@ -1,0 +1,21 @@
+<%# The whole chart: a table per type, then what is archived. Redrawn in one piece after an archive or a restore. %>
+<%= tag.div id: dom_id(Current.organization, :chart) do %>
+  <% if @grouped.empty? && @archived.empty? %>
+    <p class="empty-state">
+      No accounts yet. <%= link_to "Import a Chart of Accounts CSV", new_chart_of_accounts_import_path %> or <%= link_to "add one", new_account_path %> to get started.
+    </p>
+  <% end %>
+  <% @grouped.each do |type, accounts| %>
+    <section class="account-group">
+      <h2><%= type.pluralize %></h2>
+      <%= render "accounts/table", accounts: accounts %>
+    </section>
+  <% end %>
+  <% if @archived.any? %>
+    <section class="account-group archived-accounts">
+      <h2>Archived</h2>
+      <p class="muted" style="margin:0 0 10px;font-size:13px;">Off the lists you pick from. Their postings and balances stay on the ledger and in the reports.</p>
+      <%= render "accounts/table", accounts: @archived, show_type: true %>
+    </section>
+  <% end %>
+<% end %>
