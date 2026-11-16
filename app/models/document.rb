@@ -12,6 +12,7 @@ class Document < ApplicationRecord
   include HasLineItems
   include HasBalanceDue
   include DocumentHistory
+  include Shareable
 
   attr_accessor :created_via   # noted in the history: "memory" when reconcile coded it from past codings
   attr_accessor :contact_name  # a name typed on a form: the contact is found or made before validation
@@ -148,6 +149,7 @@ class Document < ApplicationRecord
     raise ActiveRecord::RecordInvalid.new(self) unless approved? && deletable?
     transaction do
       Ledger.reset_for(self)
+      end_share   # a draft is nobody's business; approving again does not bring the link back
       update!(state: "draft")
       record_event!(:unapproved)
     end
@@ -185,6 +187,7 @@ class Document < ApplicationRecord
       payments.each { |p| p.unwind!(record: false) }
       bank_transactions.each(&:unlink!)
       Ledger.reset_for(self)
+      end_share
       update_columns(voided_at: Time.current, updated_at: Time.current)
       record_event!(:voided, **consequences)
     end

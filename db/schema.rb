@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_15_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_16_100000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -191,6 +191,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_100000) do
     t.index ["document_id"], name: "index_document_events_on_document_id"
     t.index ["organization_id"], name: "index_document_events_on_organization_id"
     t.index ["user_id"], name: "index_document_events_on_user_id"
+  end
+
+  create_table "document_shares", force: :cascade do |t|
+    t.integer "document_id", null: false
+    t.integer "organization_id", null: false
+    t.string "token", null: false
+    t.datetime "created_at", null: false
+    t.index ["document_id"], name: "index_document_shares_on_document_id", unique: true
+    t.index ["organization_id"], name: "index_document_shares_on_organization_id"
+    t.index ["token"], name: "index_document_shares_on_token", unique: true
   end
 
   create_table "documents", force: :cascade do |t|
@@ -513,6 +523,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_100000) do
   add_foreign_key "document_events", "documents"
   add_foreign_key "document_events", "organizations"
   add_foreign_key "document_events", "users"
+  add_foreign_key "document_shares", "documents"
+  add_foreign_key "document_shares", "organizations"
   add_foreign_key "documents", "contacts"
   add_foreign_key "documents", "contacts", column: "billable_to_id"
   add_foreign_key "documents", "organizations"

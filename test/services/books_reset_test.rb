@@ -31,6 +31,13 @@ class BooksResetTest < ActiveSupport::TestCase
     assert_match(/invoices\s+2 → 0/, report.to_s)
   end
 
+  test "a reset takes shared invoice links with the invoices" do
+    @org.documents.invoices.posted.first.start_sharing!
+    BooksReset.new(@org, scope: :transactions).call
+    assert_equal 0, DocumentShare.count
+    assert_equal 0, @org.documents.count
+  end
+
   test "everything scope leaves an empty organisation with its users intact" do
     users = @org.users.count
     BooksReset.new(@org, scope: :everything).call

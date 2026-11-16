@@ -2,7 +2,7 @@
 # reader needs (what changed, how much, to whom). Xero calls this "History &
 # Notes"; notes are events too.
 class DocumentEvent < ApplicationRecord
-  ACTIONS = %w[created edited approved unapproved sent unsent voided payment_recorded payment_removed emailed matched unmatched imported note].freeze
+  ACTIONS = %w[created edited approved unapproved sent unsent voided payment_recorded payment_removed emailed matched unmatched imported note shared share_rolled share_stopped].freeze
 
   belongs_to :document
   belongs_to :organization
@@ -45,6 +45,9 @@ class DocumentEvent < ApplicationRecord
     when "unmatched"        then "Unmatched from a bank line"
     when "imported"         then "Updated by import"
     when "note"             then "Note"
+    when "shared"           then "Share link created"
+    when "share_rolled"     then "Share link rolled"
+    when "share_stopped"    then "Share link stopped"
     end
   end
 
@@ -69,6 +72,8 @@ class DocumentEvent < ApplicationRecord
       [ [ d["bank_account"], d["posted_on"], (d["amount"] && money(d["amount"])), d["description"] ].compact_blank.join(" · ") ]
     when "note"
       [ d["text"].to_s ]
+    when "shared", "share_rolled"
+      [ ("Expires #{Date.iso8601(d['expires_on']).strftime('%b %-d, %Y')}" if d["expires_on"]) ].compact
     else
       []
     end
