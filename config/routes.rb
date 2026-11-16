@@ -123,5 +123,8 @@ Rails.application.routes.draw do
   end
 
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  # A share link: the invoice and its PDF for whoever holds the token, no sign-in.
+  get "i/:token", to: "public/invoices#show", as: :public_invoice, constraints: { format: /pdf/ }
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

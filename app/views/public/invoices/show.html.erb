@@ -1,0 +1,10 @@
+<% content_for :title, "Invoice #{@document.invoice.number} from #{@document.organization.name}" %>
+<% content_for :body_class, "print-page" %>
+<%= render "invoices/paper_styles" %>
+
+<div class="print-hide" style="margin-bottom:16px;">
+  <%= link_to "Download PDF", public_invoice_path(params[:token], format: :pdf), class: "btn btn-primary" %>
+  <button onclick="window.print()" class="btn btn-secondary">Print</button>
+</div>
+
+<%= render "invoices/paper", document: @document, paid_mark: true %>

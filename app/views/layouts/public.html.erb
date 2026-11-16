@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<%# A page for someone outside the organisation: the content and nothing of the app.
+    No scripts, no fonts or images from anywhere else, so the address goes nowhere. %>
+<html lang="en" data-theme="light">
+  <head>
+    <title><%= content_for(:title) %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="referrer" content="no-referrer">
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+    <%= stylesheet_link_tag :app %>
+    <%= yield :head %>
+  </head>
+  <body class="<%= yield(:body_class) %>">
+    <main class="app-main"><%= yield %></main>
+  </body>
+</html>

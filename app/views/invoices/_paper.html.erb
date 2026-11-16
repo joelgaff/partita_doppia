@@ -1,0 +1,83 @@
+<%# The invoice as it reads on paper: header, who it is billed to, lines, totals, where to pay. %>
+<% invoice = document.invoice %>
+<div class="doc">
+<div class="invoice-header">
+  <div>
+    <h1>Invoice<% if document.draft? %> <span class="draft-mark">DRAFT</span><% elsif local_assigns[:paid_mark] && document.paid? %> <span class="draft-mark paid-mark">PAID</span><% end %></h1>
+    <p style="margin:8px 0 0;color:var(--text-muted);"><%= invoice.number %></p>
+  </div>
+  <div class="invoice-meta">
+    <strong><%= document.organization.name %></strong><br>
+    Issued <%= document.date.strftime("%b %-d, %Y") %><br>
+    Due <%= invoice.due_date.strftime("%b %-d, %Y") %>
+    <% if document.reference.present? %><br>Reference <%= document.reference %><% end %>
+    <% if document.contact&.account_number.present? %><br>Account no. <%= document.contact.account_number %><% end %>
+  </div>
+</div>
+
+<div class="invoice-bill">
+  <div>
+    <h3>Billed to</h3>
+    <div><%= document.counterparty %></div>
+    <% if document.contact %>
+      <% c = document.contact %>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">
+        <%= c.email %><br>
+        <%= [c.address, [c.city, c.region, c.postal_code].compact_blank.join(", "), c.country].compact_blank.join("\n").then { |a| simple_format a, {}, wrapper_tag: "span" } if [c.address, c.city, c.country].any?(&:present?) %>
+      </div>
+    <% end %>
+  </div>
+  <div>
+    <h3>Balance due</h3>
+    <div style="font-size:24px;font-weight:600;">$<%= number_with_precision(document.balance_due, precision: 2, delimiter: ",") %></div>
+    <div style="font-size:12px;color:var(--text-muted);">of $<%= number_with_precision(document.total, precision: 2, delimiter: ",") %></div>
+  </div>
+</div>
+
+<table class="invoice-lines">
+  <thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Amount</th></tr></thead>
+  <tbody>
+    <% document.line_items.each do |li| %>
+      <tr>
+        <td><%= li.description.presence || li.account.name %></td>
+        <td class="num"><%= li.quantity.to_d.frac.zero? ? li.quantity.to_i : li.quantity %></td>
+        <td class="num">$<%= number_with_precision(li.unit_amount, precision: 2, delimiter: ",") %></td>
+        <td class="num">$<%= number_with_precision(li.amount, precision: 2, delimiter: ",") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<table class="totals">
+  <tr>
+    <td>Subtotal</td>
+    <td class="num">$<%= number_with_precision(document.subtotal, precision: 2, delimiter: ",") %></td>
+  </tr>
+  <% document.line_ledger_legs[:taxes].each do |tax, amt| %>
+    <tr>
+      <td><%= tax.name %></td>
+      <td class="num">$<%= number_with_precision(amt, precision: 2, delimiter: ",") %></td>
+    </tr>
+  <% end %>
+  <tr class="total">
+    <td>Total</td>
+    <td class="num">$<%= number_with_precision(document.total, precision: 2, delimiter: ",") %></td>
+  </tr>
+  <% if document.paid_amount.positive? %>
+    <tr>
+      <td>Paid</td>
+      <td class="num">−$<%= number_with_precision(document.paid_amount, precision: 2, delimiter: ",") %></td>
+    </tr>
+    <tr class="total">
+      <td>Balance due</td>
+      <td class="num">$<%= number_with_precision(document.balance_due, precision: 2, delimiter: ",") %></td>
+    </tr>
+  <% end %>
+</table>
+</div>
+
+<% if (lines = document.organization.settings.mailing_address_lines).any? %>
+  <p class="payment-instructions" style="margin-top:28px;font-size:12px;color:var(--paper-dim);">
+    <%= document.organization.settings.payment_instructions_lead %> <%= safe_join(lines, tag.br) %>
+  </p>
+<% end %>
