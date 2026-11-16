@@ -21,3 +21,6 @@ production:
     class: SimpleFinSyncJob
     queue: default
     schedule: every day at 4am UTC
+  sweep_expired_share_links:
+    command: "DocumentShare.sweep_expired"
+    schedule: every day at 5am UTC
