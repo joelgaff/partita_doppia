@@ -23,6 +23,7 @@ class InvoiceShareLinkSystemTest < ApplicationSystemTestCase
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, page.evaluate_script("window.innerWidth"), "no sideways scroll"
     page.save_screenshot(ENV["SHOT"]) if ENV["SHOT"]
 
+    assert_no_selector "#{section} button", text: "Share", visible: true   # the app's button; a browser has Copy
     within(section) { click_button "Copy" }
     assert_selector "#{section} button", text: "Copied"
 

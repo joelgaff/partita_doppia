@@ -118,6 +118,8 @@
   (`config/initializers/filter_share_tokens_from_log.rb`). `Invoices::SharesController` is the
   signed-in side; `invoices/_share` is the section on the invoice page, and `invoices/_paper` is the
   invoice markup the print page and the public page share.
+- In the app the section also has Share: the `share-link` bridge component hands the address to the
+  native share sheet. It is its own component, so the button shows only in a build that registers it.
 
 ## The iOS app (Hotwire Native)
 - Lives in `partita_doppia_ios`, cloned beside this one. Inside the app (`hotwire_native_app?`,
@@ -126,7 +128,7 @@
   `/configurations/ios_v1.json` (`NativePathConfiguration`) names modal paths and native screens;
   keep it in step with the app's bundled `path-configuration.json`. `/menu` is the app's More
   tab. Bridge Stimulus controllers live in `app/javascript/controllers/bridge/` (`form`, `button`,
-  `menu`, `share`, `theme`) on `@hotwired/hotwire-native-bridge`, vendored under `vendor/javascript`.
+  `menu`, `share`, `share_link`, `theme`) on `@hotwired/hotwire-native-bridge`, vendored under `vendor/javascript`.
   Every page has a `page_title` (the app's navigation bar shows it). `DEV_LOGIN_CODE` pins the
   sign-in code in development only, for driving the app in a simulator.
 

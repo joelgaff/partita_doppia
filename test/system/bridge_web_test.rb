@@ -5,12 +5,12 @@ require "application_system_test_case"
 # every message. What the native side would receive, without the native side.
 class BridgeWebTest < ApplicationSystemTestCase
   NATIVE_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 " \
-              "Partita Doppia iOS/0.1.0 Hotwire Native iOS; Turbo Native iOS; bridge-components: [form menu theme share button];"
+              "Partita Doppia iOS/0.1.0 Hotwire Native iOS; Turbo Native iOS; bridge-components: [form menu theme share button share-link];"
   FAKE_ADAPTER = <<~JS
     window.__bridgeMessages = [];
     window.HotwireNative.web.setAdapter({
       platform: "ios",
-      supportedComponents: ["form", "menu", "theme", "share", "button"],
+      supportedComponents: ["form", "menu", "theme", "share", "button", "share-link"],
       supportsComponent(c) { return this.supportedComponents.includes(c) },
       receive(m) { window.__bridgeMessages.push(m) }
     });
@@ -68,5 +68,18 @@ class BridgeWebTest < ApplicationSystemTestCase
     assert_equal [ "Print / PDF", "Email", "Copy", "Void", "Delete" ], items.map { |i| i["title"] }
     assert_equal [ false, false, false, true, true ], items.map { |i| i["destructive"] }
     assert_empty message("share").to_a, "share only speaks when Print is chosen"
+  end
+
+  test "an invoice's share link goes to the app as a link, when Share is tapped" do
+    token = @invoice.start_sharing!.token
+    visit_as_app "/invoices/#{@invoice.id}"
+    assert_nil message("share-link", "share"), "nothing until it is tapped"
+    find(".share-link button", text: "Share").click
+    sleep 0.3
+    sent = message("share-link", "share")&.fetch("data")
+    assert sent, "share-link share: #{messages.inspect}"
+    assert_match %r{\Ahttp://[^/]+/i/#{token}\z}, sent["url"]
+    assert_equal "Invoice #{@invoice.invoice.number} from #{@org.name}", sent["title"]
+    assert_selector ".share-link button", text: "Copy", visible: true
   end
 end

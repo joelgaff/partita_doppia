@@ -9,6 +9,10 @@
         <%= text_field_tag nil, public_invoice_url(share.token), id: dom_id(document, :share_url), readonly: true,
               "aria-label": "Share link", data: { clipboard_target: "source", action: "focus->clipboard#select" } %>
         <button type="button" class="btn btn-secondary" data-clipboard-target="button" data-action="clipboard#copy">Copy</button>
+        <%# Only in the app, and only one that has the share-link component (see the stylesheet). %>
+        <%= tag.button "Share", type: "button", class: "btn btn-secondary share-link-native",
+              data: { controller: "bridge--share-link", action: "bridge--share-link#share", bridge_url: public_invoice_url(share.token),
+                      bridge_title: "Invoice #{document.invoice.number} from #{document.organization.name}" } %>
       </div>
       <p class="field-help">Anyone with this link can see the invoice as it stands and download its PDF, without signing in. Expires <%= share.expires_at.strftime("%b %-d, %Y") %>.</p>
       <div class="share-link-actions">

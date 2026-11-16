@@ -20,7 +20,6 @@ Open items, roughly in priority order. Nothing here blocks daily use.
 ## Documents
 - [ ] Recurring bills (recurring invoices exist).
 - [ ] Attachments on deposits and transfers in the UI (the model already supports them).
-- [ ] Share link in the iOS share sheet. The invoice page copies the link to the clipboard; the app's share component sends files (it downloads the URL as a PDF), so handing over a link needs a small change in `partita_doppia_ios`.
 
 ## Platform
 - [ ] Multi-tenant membership and switching (structure is ready; single-tenant today).
