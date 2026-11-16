@@ -2,3 +2,6 @@
 <% if @document.settleable? %>
   <%= turbo_stream.replace dom_id(@document, :payments), partial: "documents/payments", locals: { document: @document } %>
 <% end %>
+<% if @document.invoice? %>
+  <%= turbo_stream.replace dom_id(@document, :share), partial: "invoices/share", locals: { document: @document } %>
+<% end %>

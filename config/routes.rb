@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       post :mark_unsent
       get  :copy
     end
+    resource :share, only: %i[create update destroy], module: :invoices   # the public link: make, roll, stop
   end
   resources :bills, only: %i[index show new create edit update destroy] do
     member { post :void; post :approve; get :copy }

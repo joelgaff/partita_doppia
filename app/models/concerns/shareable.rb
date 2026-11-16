@@ -22,6 +22,7 @@ module Shareable
   def roll_share! = replace_share(:share_rolled)
 
   def stop_sharing!
+    return if share.nil?
     transaction do
       end_share
       record_event!(:share_stopped)

@@ -1357,3 +1357,10 @@ body.native .app-tabs-wrap { display: none; }
   .recon-table .recon-panel td { display: block; padding: 8px 4px; }
   .recon-form .field, .recon-form .field.grow { flex: 1 1 100%; }
 }
+
+/* The share link on an invoice: the address, a copy button, roll and stop. */
+.share-link h2 { font-size: 15px; font-weight: 600; margin: 32px 0 12px; }
+.share-link-row { display: flex; gap: 8px; align-items: center; max-width: 640px; }
+.share-link-row input { flex: 1; min-width: 0; }
+.share-link .field-help { display: block; margin: 8px 0 12px; max-width: 640px; }
+.share-link-actions { display: flex; gap: 8px; flex-wrap: wrap; }

@@ -1,0 +1,25 @@
+<%# The invoice's public link: none until someone makes it, then the address with
+    copy, roll and stop. Always rendered, empty for a draft or a voided invoice,
+    so a Turbo stream after approve or void has something to replace. %>
+<%= tag.section id: dom_id(document, :share), class: "share-link" do %>
+  <% if document.shareable? %>
+    <h2>Share link</h2>
+    <% if (share = document.live_share) %>
+      <div class="share-link-row" data-controller="clipboard">
+        <%= text_field_tag nil, public_invoice_url(share.token), id: dom_id(document, :share_url), readonly: true,
+              "aria-label": "Share link", data: { clipboard_target: "source", action: "focus->clipboard#select" } %>
+        <button type="button" class="btn btn-secondary" data-clipboard-target="button" data-action="clipboard#copy">Copy</button>
+      </div>
+      <p class="field-help">Anyone with this link can see the invoice as it stands and download its PDF, without signing in. Expires <%= share.expires_at.strftime("%b %-d, %Y") %>.</p>
+      <div class="share-link-actions">
+        <%= button_to "Roll link", invoice_share_path(document), method: :patch, class: "btn btn-secondary",
+              form: { class: "inline-form", data: { turbo_confirm: "Roll the link? The current one stops working at once; the new one is good for a year." } } %>
+        <%= button_to "Stop sharing", invoice_share_path(document), method: :delete, class: "btn btn-secondary btn-danger",
+              form: { class: "inline-form", data: { turbo_confirm: "Stop sharing #{document.label}? The link stops working at once." } } %>
+      </div>
+    <% else %>
+      <p class="field-help">A link anyone can open to see this invoice and download its PDF, without signing in. It works for a year, or until you stop it.</p>
+      <%= button_to "Create link", invoice_share_path(document), class: "btn btn-secondary", form: { class: "inline-form" } %>
+    <% end %>
+  <% end %>
+<% end %>
