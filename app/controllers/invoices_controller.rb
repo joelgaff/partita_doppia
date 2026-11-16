@@ -11,16 +11,21 @@ class InvoicesController < DocumentsController
   def email; end
 
   def send_email
-    to      = params.require(:to)
+    to      = recipients(params.require(:to))
     subject = params[:subject].presence
     body    = params[:body].presence
+
+    if to.empty? || (bad = to.grep_v(URI::MailTo::EMAIL_REGEXP)).any?
+      flash.now[:alert] = bad.present? ? "#{bad.to_sentence} #{bad.one? ? "isn't an email address" : "aren't email addresses"}." : "Add an email address to send to."
+      return render :email, status: :unprocessable_entity
+    end
 
     copy_to = params[:copy_to].to_s.strip.presence if params[:copy_to_me].present?
 
     InvoiceMailer.send_invoice(@document, to: to, subject: subject, body: body, bcc: copy_to).deliver_later
-    @document.record_event!(:emailed, to: to, subject: subject || InvoiceMailer.default_subject(@document), pdf: true, copy_to: copy_to)
+    @document.record_event!(:emailed, to: to.join(", "), subject: subject || InvoiceMailer.default_subject(@document), pdf: true, copy_to: copy_to)
     @document.invoice.mark_sent!(quietly: true)
-    redirect_to invoice_path(@document), notice: "Invoice emailed to #{to}#{copy_to ? ", with a copy to #{copy_to}," : ''} with the PDF attached."
+    redirect_to invoice_path(@document), notice: "Invoice emailed to #{to.to_sentence}#{copy_to ? ", with a copy to #{copy_to}," : ''} with the PDF attached."
   end
 
   # Sent some other way than email from here: by hand, by post, from another system.
@@ -49,6 +54,9 @@ class InvoicesController < DocumentsController
     return super unless @status == "unsent"
     index_scope.posted.select { |d| !d.invoice.sent? && !d.paid? }
   end
+
+  # One address or several, separated by commas (semicolons and line breaks too).
+  def recipients(value) = value.to_s.split(/[,;\s]+/).compact_blank.uniq(&:downcase)
 
   def due_on(document) = document.invoice.due_date
 

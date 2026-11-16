@@ -5,11 +5,12 @@
 <%= form_with url: send_email_invoice_path(@document), method: :post, class: "app-form", data: bridge_form_data("Send email") do |f| %>
   <div class="field">
     <%= f.label :to, "Send to (email)" %>
-    <%= f.email_field :to, value: @document.contact&.email, required: true %>
+    <%= f.email_field :to, value: params[:to] || @document.contact&.email, name: "to", required: true, multiple: true, placeholder: "billing@example.com, accounts@example.com" %>
+    <span class="field-help">Separate multiple addresses with commas.</span>
   </div>
   <div class="field">
     <%= f.label :subject %>
-    <%= f.text_field :subject, value: "Invoice #{@document.invoice.number} from #{@document.organization.name}" %>
+    <%= f.text_field :subject, value: params[:subject] || "Invoice #{@document.invoice.number} from #{@document.organization.name}" %>
   </div>
   <p class="muted" style="font-size:13px;margin:0 0 16px;">The invoice is attached as a PDF (<%= link_to InvoicePdf.filename(@document), print_invoice_path(@document, format: :pdf), target: "_blank" %>) and summarised in the body.</p>
   <% copy_to = @document.organization.settings.email_copy_to %>
@@ -22,7 +23,7 @@
   </div>
   <div class="field">
     <%= f.label :body, "Personal note (optional)" %>
-    <%= f.text_area :body, rows: 5, placeholder: "Thanks for your business…" %>
+    <%= f.text_area :body, value: params[:body], rows: 5, placeholder: "Thanks for your business…" %>
   </div>
   <div class="form-actions">
     <%= f.submit "Send email", class: "btn btn-primary" %>
