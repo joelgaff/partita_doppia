@@ -88,6 +88,22 @@
   Reconcile's Create panel and `Memory` carry `billable_to` too. Gross method: the cost stays an
   expense, the invoice line is revenue.
 
+## Share links
+- An approved invoice can carry one public link (`DocumentShare`, `has_one :share` through the
+  `Shareable` concern on `Document`): the record being there is what "shared" means. The token is
+  encrypted (deterministic, so it can be looked up) and shown on the invoice page. `start_sharing!`,
+  `roll_share!` (new token, new year) and `stop_sharing!` each write a history line; voiding or
+  unapproving ends the link for good. Links are made by hand only: emailing an invoice makes none.
+- A link lasts `DocumentShare::LIFETIME` (one year) from the day it was made, with no extending;
+  expiry is checked on every lookup and `DocumentShare.sweep_expired` runs nightly (`config/recurring.yml`).
+- `/i/:token` (`Public::InvoicesController`, layout `public`) serves the live invoice and its PDF
+  without sign-in, finds it by token alone (`DocumentShare.shared_invoice`), and answers every link
+  that doesn't work with the same 404. The public layout loads no scripts and nothing from another
+  site; keep it that way. The token is struck from the request log
+  (`config/initializers/filter_share_tokens_from_log.rb`). `Invoices::SharesController` is the
+  signed-in side; `invoices/_share` is the section on the invoice page, and `invoices/_paper` is the
+  invoice markup the print page and the public page share.
+
 ## The iOS app (Hotwire Native)
 - Lives in `partita_doppia_ios`, cloned beside this one. Inside the app (`hotwire_native_app?`,
   turbo-rails' user-agent check) the layout drops its own chrome, serves `viewport-fit=auto`, and
