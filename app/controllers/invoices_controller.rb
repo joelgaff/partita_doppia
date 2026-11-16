@@ -79,7 +79,7 @@ class InvoicesController < DocumentsController
   end
 
   def load_form_collections
-    @revenue_accounts    = Plutus::Revenue.where(tenant: Current.organization).order(:name)
+    @revenue_accounts    = Plutus::Revenue.where(tenant: Current.organization).active.order(:name)
     @customers           = Current.organization.contacts.customers.ordered
     @tax_rates           = Current.organization.tax_rates.ordered
   end

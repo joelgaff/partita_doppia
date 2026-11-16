@@ -8,7 +8,7 @@ class Contacts::BillableExpensesController < ApplicationController
                       .includes(:contact, :documentable, line_items: [ :account, :tax_rate, { tracking_selections: :tracking_option } ])
     @invoice = Current.organization.documents.build(contact: @contact, documentable: Invoice.new)
     @rows    = @costs.index_with { |cost| Billing::PickUp.new(@invoice, [ cost ], markup: @markup).lines }
-    revenue  = Plutus::Revenue.where(tenant: Current.organization).order(:name).to_a
+    revenue  = Plutus::Revenue.where(tenant: Current.organization).active.order(:name).to_a
     @accounts  = (revenue + @rows.values.flatten.map(&:account)).uniq
     @tax_rates = Current.organization.tax_rates.ordered
   end

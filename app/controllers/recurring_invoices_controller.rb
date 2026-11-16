@@ -65,7 +65,7 @@ class RecurringInvoicesController < ApplicationController
   end
 
   def load_form_collections
-    @revenue_accounts    = Plutus::Revenue.where(tenant: Current.organization).order(:code, :name)
+    @revenue_accounts    = Plutus::Revenue.where(tenant: Current.organization).active.order(:code, :name)
     @customers           = Current.organization.contacts.customers.ordered
     @tax_rates           = Current.organization.tax_rates.ordered
   end

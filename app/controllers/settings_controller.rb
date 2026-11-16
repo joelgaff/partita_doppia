@@ -126,9 +126,9 @@ class SettingsController < ApplicationController
 
   def load_accounts
     @bank_accounts      = Current.organization.bank_accounts.active.ordered
-    @asset_accounts     = Plutus::Asset.where(tenant: Current.organization).order(:code, :name)
-    @liability_accounts = Plutus::Liability.where(tenant: Current.organization).order(:code, :name)
-    @revenue_accounts   = Plutus::Revenue.where(tenant: Current.organization).order(:code, :name)
+    @asset_accounts     = Plutus::Asset.where(tenant: Current.organization).active.order(:code, :name)
+    @liability_accounts = Plutus::Liability.where(tenant: Current.organization).active.order(:code, :name)
+    @revenue_accounts   = Plutus::Revenue.where(tenant: Current.organization).active.order(:code, :name)
   end
 
   def settings_params

@@ -20,6 +20,6 @@ class JournalEntriesController < DocumentsController
   alias_method :after_failed_update, :after_failed_create
 
   def load_form_collections
-    @accounts = Plutus::Account.where(tenant: Current.organization).order(:type, :code, :name)
+    @accounts = Plutus::Account.where(tenant: Current.organization).active.order(:type, :code, :name)
   end
 end

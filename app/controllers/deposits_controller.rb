@@ -14,7 +14,7 @@ class DepositsController < DocumentsController
 
   def load_form_collections
     org = Current.organization
-    @income_accounts = org.plutus_accounts.where.not(id: org.bank_accounts.select(:account_id))
+    @income_accounts = org.plutus_accounts.active.where.not(id: org.bank_accounts.select(:account_id))
                           .order(Arel.sql("CASE type WHEN 'Plutus::Revenue' THEN 0 ELSE 1 END"), :code, :name)
     @bank_accounts   = org.bank_accounts.active.ordered
     @customers       = org.contacts.customers.ordered

@@ -53,6 +53,7 @@ module Reconciliation
         (reconciled_documents + named_documents).each do |key, document, bank_words|
           next unless seen.add?([ key, document.id ])
           line = document.line_items.first or next
+          next if line.account.archived?   # nothing new is coded to an archived account
           by_key[key] << Coding.new(document: document, contact_name: document.counterparty, account: line.account,
                                     tax_rate: line.tax_rate, tracking_option_ids: line.tracking_option_ids.sort,
                                     memo: why_of(line, bank_words), billable_to_name: document.billable_to&.name)

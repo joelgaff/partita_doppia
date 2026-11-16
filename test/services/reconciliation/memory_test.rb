@@ -40,6 +40,17 @@ class Reconciliation::MemoryTest < ActiveSupport::TestCase
     assert_nil hit.tax_rate, "tax differs across the three, so none is assumed"
   end
 
+  test "memory forgets codings to an account that has since been archived" do
+    coded("BLUEPIXEL HOSTING 07/02", account: @hosting, on: Date.new(2026, 7, 2))
+    coded("BLUEPIXEL HOSTING 08/02", account: @hosting, on: Date.new(2026, 8, 2))
+    coded("BLUEPIXEL HOSTING 09/02", account: @hosting, on: Date.new(2026, 9, 2))
+    fresh = line(-48, "BLUEPIXEL HOSTING 10/02")
+    assert Reconciliation::Memory.new(@org, [ fresh ]).for(fresh).confident?
+
+    @hosting.archive!
+    assert_nil Reconciliation::Memory.new(@org, [ fresh ]).for(fresh)
+  end
+
   test "fewer than three, or disagreement, is a hint carrying the most recent coding" do
     coded("AMZN MKTP US*2K3", account: @hosting,  on: Date.new(2026, 8, 1), contact: "Amazon")
     coded("AMZN MKTP US*7Q9", account: @software, on: Date.new(2026, 9, 1), contact: "Amazon")

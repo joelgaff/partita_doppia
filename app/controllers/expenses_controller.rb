@@ -15,7 +15,7 @@ class ExpensesController < DocumentsController
 
   def load_form_collections
     @customers        = Current.organization.contacts.customers.ordered
-    @expense_accounts = Plutus::Expense.where(tenant: Current.organization).order(:name)
+    @expense_accounts = Plutus::Expense.where(tenant: Current.organization).active.order(:name)
     @bank_accounts    = Current.organization.bank_accounts.active.ordered
     @vendors          = Current.organization.contacts.vendors.ordered
     @tax_rates        = Current.organization.tax_rates.ordered

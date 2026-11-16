@@ -40,7 +40,7 @@ class TaxRatesController < ApplicationController
   private
 
   def load_accounts
-    scope = Plutus::Account.where(tenant: Current.organization).order(:code, :name)
+    scope = Plutus::Account.where(tenant: Current.organization).active.order(:code, :name)
     @liability_accounts = scope.where(type: "Plutus::Liability")
     @asset_accounts     = scope.where(type: "Plutus::Asset")
   end

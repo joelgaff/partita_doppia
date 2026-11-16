@@ -125,8 +125,8 @@ class BankTransactionsController < ApplicationController
     org = Current.organization
     # Loaded once: the row partials render these for every line on the page.
     @bank_accounts = org.bank_accounts.active.ordered.to_a
-    @expense_accts = Plutus::Expense.where(tenant: org).order(:code, :name).to_a
-    @income_accts  = org.plutus_accounts.where.not(id: org.bank_accounts.select(:account_id))
+    @expense_accts = Plutus::Expense.where(tenant: org).active.order(:code, :name).to_a
+    @income_accts  = org.plutus_accounts.active.where.not(id: org.bank_accounts.select(:account_id))
                         .order(Arel.sql("CASE type WHEN 'Plutus::Revenue' THEN 0 ELSE 1 END"), :code, :name).to_a
     @tax_rates     = org.tax_rates.ordered.to_a
     @contact_names = org.contacts.ordered.pluck(:name)

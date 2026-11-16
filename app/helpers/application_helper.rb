@@ -126,6 +126,12 @@ module ApplicationHelper
   end
 
   # "Partita Doppia", never split or shortened.
+  # The accounts a picker offers, plus the one this row already uses when it has
+  # since been archived: an old document keeps its account through an edit.
+  def with_chosen_account(accounts, chosen)
+    chosen.nil? || accounts.include?(chosen) ? accounts : accounts.to_a + [ chosen ]
+  end
+
   def app_name = Rails.application.config.x.app_name
 
   def money(amount)

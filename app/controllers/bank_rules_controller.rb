@@ -49,7 +49,7 @@ class BankRulesController < ApplicationController
   def load_collections
     org = Current.organization
     @bank_accounts = org.bank_accounts.active.ordered.to_a
-    @accounts      = org.plutus_accounts.where.not(id: org.bank_accounts.select(:account_id)).order(:type, :code, :name).to_a
+    @accounts      = org.plutus_accounts.active.where.not(id: org.bank_accounts.select(:account_id)).order(:type, :code, :name).to_a
     @contacts      = org.contacts.ordered.to_a
     @tax_rates     = org.tax_rates.ordered.to_a
   end

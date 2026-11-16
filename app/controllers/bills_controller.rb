@@ -17,7 +17,7 @@ class BillsController < DocumentsController
 
   def load_form_collections
     @customers        = Current.organization.contacts.customers.ordered
-    scope = Plutus::Account.where(tenant: Current.organization)
+    scope = Plutus::Account.where(tenant: Current.organization).active
     @expense_accounts   = scope.where(type: "Plutus::Expense").order(:name)
     @vendors            = Current.organization.contacts.vendors.ordered
     @tax_rates          = Current.organization.tax_rates.ordered
