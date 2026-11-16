@@ -1,10 +1,10 @@
-<table class="data-table">
+<table class="data-table chart-table">
   <thead>
     <tr>
       <th style="width:80px">Code</th>
       <th>Name</th>
       <% if local_assigns[:show_type] %><th>Type</th><% end %>
-      <th>Description</th>
+      <th class="chart-description">Description</th>
       <th class="num">Balance</th>
       <th class="num"></th>
     </tr>
@@ -20,7 +20,7 @@
           <% end %>
         </td>
         <% if local_assigns[:show_type] %><td data-label="Type"><%= account.type.demodulize %></td><% end %>
-        <td data-label="Description" class="muted"><%= account.description %></td>
+        <td data-label="Description" class="muted chart-description"><%= account.description %></td>
         <td data-label="Balance" class="num">$<%= number_with_precision(account.balance, precision: 2, delimiter: ",") %></td>
         <td class="num">
           <% if account.archived? %>

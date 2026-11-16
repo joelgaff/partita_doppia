@@ -88,6 +88,17 @@
   Reconcile's Create panel and `Memory` carry `billable_to` too. Gross method: the cost stays an
   expense, the invoice line is revenue.
 
+## Chart of accounts
+- Accounts are `Plutus::Account` rows scoped by `tenant`; the app's additions are mixed in from
+  `config/initializers/plutus_bank_accounts.rb` (`AccountArchiving`, the `bank_account` link).
+  `AccountsController` lists the chart, adds an account by hand (type, name, code, description) and
+  archives or restores one; bank accounts and cards are added under Banking.
+- Archiving (`archived_at`) hides an account from pickers and nothing else: postings, balances and
+  reports keep it. Every picker query ends in `.active`; a line already on an archived account keeps
+  it through an edit (`with_chosen_account`). `archive_blocker` names what still depends on an
+  account (a bank account, a control account in Settings, a tax rate, a bank rule, a recurring
+  invoice) and `archive!` refuses while anything does.
+
 ## Share links
 - An approved invoice can carry one public link (`DocumentShare`, `has_one :share` through the
   `Shareable` concern on `Document`): the record being there is what "shared" means. The token is

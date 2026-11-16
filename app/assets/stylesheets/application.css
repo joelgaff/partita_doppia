@@ -1364,3 +1364,6 @@ body.native .app-tabs-wrap { display: none; }
 .share-link-row input { flex: 1; min-width: 0; }
 .share-link .field-help { display: block; margin: 8px 0 12px; max-width: 640px; }
 .share-link-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* The chart of accounts on a phone: the description gives way so the balance and Archive stay in reach. */
+@media (max-width: 700px) { .chart-table .chart-description { display: none; } }
