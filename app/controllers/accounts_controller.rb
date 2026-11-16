@@ -29,6 +29,7 @@ class AccountsController < ApplicationController
   end
 
   def restore
+    return redirect_to(accounts_path, alert: "#{@account.name} is a bank account; restore it under Banking.") if @account.bank_account
     @account.restore!
     respond_with_chart "#{@account.name} restored."
   end

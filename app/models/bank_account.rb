@@ -58,10 +58,19 @@ class BankAccount < ApplicationRecord
   def kind_label   = kind.humanize
   def display_name = code.present? ? "#{code} — #{name}" : name
 
-  def archive!  = update!(archived_at: Time.current)
-  def restore!  = update!(archived_at: nil)
+  # The ledger account goes with it, so it leaves the chart's pickers too
+  # (see AccountArchiving); its postings and balance are untouched.
+  def archive! = set_archived(Time.current)
+  def restore! = set_archived(nil)
 
   private
+
+  def set_archived(at)
+    transaction do
+      update!(archived_at: at)
+      account.update!(archived_at: at)
+    end
+  end
 
   def align_ledger_class
     account.tenant ||= organization
