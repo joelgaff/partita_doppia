@@ -1,5 +1,6 @@
 class LineItem < ApplicationRecord
   include Trackable
+  include RefusesArchivedAccount
 
   belongs_to :lineable, polymorphic: true
   belongs_to :account,  class_name: "Plutus::Account"

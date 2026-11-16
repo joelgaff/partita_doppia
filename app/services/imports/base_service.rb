@@ -18,6 +18,18 @@ module Imports
       end
     end
 
+    # Every importer's #call runs with Current.importing set, which lets it post
+    # history to accounts archived since (see RefusesArchivedAccount). Prepended
+    # as each subclass is defined, so no importer has to remember.
+    module Importing
+      def call(...) = Current.set(importing: true) { super }
+    end
+
+    def self.inherited(subclass)
+      super
+      subclass.prepend(Importing)
+    end
+
     HEADER_CONVERTER = ->(h) { h.to_s.sub(/\A\*/, "").strip.downcase.gsub(/\s+/, "") }
 
     def self.csv(source)

@@ -71,6 +71,16 @@ class ArchivedAccountPickersTest < ActionDispatch::IntegrationTest
     assert_hides_archived bank_transactions_path, "select[name=account_id], select[name='remainder[account_id]']"
   end
 
+  test "a reconcile page left open can't code a line to an account archived since" do
+    txn = @org.bank_transactions.create!(bank_account: @bank, posted_on: Date.current, amount: -48, description: "LANDLORD LLC")
+    @old_exp.archive!
+    assert_no_difference -> { @org.documents.count } do
+      post categorize_bank_transaction_path(txn), params: { account_id: @old_exp.id, contact_name: "Landlord" }, as: :turbo_stream
+    end
+    assert_response :unprocessable_entity
+    assert_match(/Old Expense is archived/, response.body)
+  end
+
   test "an invoice already on an archived account keeps it when edited, marked as archived" do
     invoice = create_invoice(@org, client_name: "Acme", amount: 100, receivable: @ar, revenue: @old_rev)
     @old_rev.archive!
