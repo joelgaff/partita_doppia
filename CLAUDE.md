@@ -97,7 +97,11 @@
   reports keep it. Every picker query ends in `.active`; a line already on an archived account keeps
   it through an edit (`with_chosen_account`). `archive_blocker` names what still depends on an
   account (a bank account, a control account in Settings, a tax rate, a bank rule, a recurring
-  invoice) and `archive!` refuses while anything does.
+  invoice) and `archive!` refuses while anything does. Archiving a bank account archives its ledger
+  account with it; the chart sends you to Banking for either direction.
+- Nothing new posts to an archived account: `RefusesArchivedAccount` on `LineItem` and `JournalLine`
+  refuses a new line or a line moved onto one, and leaves existing lines alone. Importers
+  (`Imports::BaseService` subclasses) run with `Current.importing` set and are let through.
 
 ## Share links
 - An approved invoice can carry one public link (`DocumentShare`, `has_one :share` through the

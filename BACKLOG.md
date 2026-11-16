@@ -9,6 +9,9 @@ Open items, roughly in priority order. Nothing here blocks daily use.
 - [ ] **Bills have no due date.** AP aging assumes 30 days from the bill date. Add `due_date` to bills when payment terms matter.
 - [ ] **Tax rates are hand-entered.** The importer exists (`tax_rates.csv` in a bundle) but nothing seeds them from Xero automatically.
 
+- [ ] **Edit a chart account.** Accounts can be added and archived, not renamed, recoded or retyped. Add an edit form if that causes friction; importers match accounts by code and name, so a rename has to be weighed against the next import.
+- [ ] **Who archived an account, and when.** `archived_at` records the time only; there is no history line for an account the way there is for a document.
+
 ## Reconcile and banking
 - [ ] Bank rule ordering UI (rules apply in `position` order; there is no drag-to-reorder yet).
 - [ ] SimpleFIN pending transactions are skipped; consider showing them greyed out.
