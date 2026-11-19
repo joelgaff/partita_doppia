@@ -22,7 +22,7 @@
   <p class="muted" style="margin:0 0 12px;font-size:13px;">
     Opening balance: <strong>$<%= number_with_precision(@report.opening_balance, precision: 2, delimiter: ",") %></strong> ·
     Closing balance: <strong>$<%= number_with_precision(@report.closing_balance, precision: 2, delimiter: ",") %></strong> ·
-    <%= link_to "Reclassify these", new_reclassification_path(from_account_id: @account.id, from: @from&.iso8601, to: @to&.iso8601) %>
+    <%= link_to "Recode these", new_recoding_path(account_id: @account.id, from: @from&.iso8601, to: @to&.iso8601) %>
   </p>
 
   <table class="data-table">

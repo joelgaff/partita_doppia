@@ -58,6 +58,9 @@ class Document < ApplicationRecord
   scope :for_customer, ->(contact) {
     where(documentable_type: "Invoice", contact_id: contact).or(where.not(documentable_type: "Invoice").where(billable_to_id: contact))
   }
+  scope :without_customer, -> {
+    where(documentable_type: "Invoice", contact_id: nil).or(where.not(documentable_type: "Invoice").where(billable_to_id: nil))
+  }
   scope :unbilled, -> { where.not(id: LineItem.rebilling.select(:rebills_document_id)) }   # no live invoice carries them yet
   scope :outstanding_between, ->(low, high) {
     where("(documents.total - COALESCE((SELECT SUM(payments.amount) FROM payments WHERE payments.document_id = documents.id), 0)) BETWEEN ? AND ?", low, high)

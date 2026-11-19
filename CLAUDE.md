@@ -108,13 +108,16 @@
   refuses a new line or a line moved onto one, and leaves existing lines alone. Importers
   (`Imports::BaseService` subclasses) run with `Current.importing` set and are let through.
 
-- Bulk recoding is `Reclassification` (a form object; `ReclassificationsController`, reached from
-  the chart and the general ledger): every `LineItem` and `JournalLine` on one account, on live
-  documents between two dates (and, when a customer is chosen, only that customer's documents,
-  `Document.for_customer`), moves to another account; each document reposts and gets a
-  `reclassified` history line. The GET page previews, the POST moves, all or nothing. Control legs
-  (bank, receivables, payables) are not lines and never move; bank rules and recurring invoices
-  keep the account they name.
+- Find and recode is `Recoding` (a form object; `RecodingsController`, reached from the chart and
+  the general ledger). It finds every `LineItem` and `JournalLine` on one account, on live
+  documents, narrowed by dates, customer (`Document.for_customer`, or `without_customer` for
+  "No customer yet") and vendor. The GET page lists them with a tick each (`checklist` Stimulus
+  controller); the POST applies to the ticked ones, all or nothing, either or both of: move to
+  another account (each document reposts and gets a `reclassified` history line) and bill to a
+  customer (the document's `billable_to`, a `billable_changed` history line; only expenses and
+  bills, overwriting another customer, skipping costs already on an invoice). Control legs (bank,
+  receivables, payables) are not lines and never move; bank rules and recurring invoices keep the
+  account they name.
 
 ## Share links
 - An approved invoice can carry one public link (`DocumentShare`, `has_one :share` through the

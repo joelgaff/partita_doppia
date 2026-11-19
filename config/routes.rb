@@ -42,7 +42,8 @@ Rails.application.routes.draw do
   resources :accounts, only: %i[index new create] do
     member { post :archive; post :restore }
   end
-  resource :reclassification, only: %i[new create]
+  resource :recoding, only: %i[new create]
+  get "reclassification/new", to: redirect { |_, request| "/recoding/new#{"?#{request.query_string}" if request.query_string.present?}" }   # its name until it did more
   resources :bank_accounts, except: :destroy do
     member do
       post :archive

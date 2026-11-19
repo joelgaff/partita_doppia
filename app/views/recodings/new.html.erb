@@ -1,0 +1,120 @@
+<% content_for :title, "Find and recode" %>
+<header class="page-header">
+  <h1>Find and recode</h1>
+</header>
+
+<% r = @recoding %>
+<% account_label = ->(a) { "#{a.code.present? ? "#{a.code} — " : ""}#{a.name} (#{a.type.demodulize})#{' (archived)' if a.archived?}" } %>
+<p class="muted" style="margin:0 0 12px;font-size:13px;max-width:70ch;">
+  Find the lines coded to an account, then move the ones you tick to another account, bill them to a customer, or both. Leave a date empty for no limit on that side.
+</p>
+
+<%= form_with url: new_recoding_path, method: :get, class: "app-form filter-bar" do |f| %>
+  <div class="field" style="flex:1 1 240px;">
+    <%= f.label :account_id, "Lines on" %>
+    <%= f.collection_select :account_id, @accounts, :id, account_label, { selected: r.account_id, include_blank: "Choose an account" } %>
+  </div>
+  <div class="field">
+    <%= f.label :from, "Dated from" %>
+    <%= f.date_field :from, value: r.from %>
+  </div>
+  <div class="field">
+    <%= f.label :to, "Through" %>
+    <%= f.date_field :to, value: r.to %>
+  </div>
+  <div class="field" style="flex:1 1 180px;">
+    <%= f.label :customer_id, "Customer" %>
+    <%= f.select :customer_id, [ [ "No customer yet", Recoding::NONE ] ] + @customers.map { |c| [ c.name, c.id ] }, { selected: r.customer_id, include_blank: "Any customer" } %>
+  </div>
+  <div class="field" style="flex:1 1 180px;">
+    <%= f.label :vendor_id, "Vendor" %>
+    <%= f.collection_select :vendor_id, @vendors, :id, :name, { selected: r.vendor_id, include_blank: "Any vendor" } %>
+  </div>
+  <%= f.submit "Find", class: "btn btn-secondary", name: nil %>
+<% end %>
+
+<% if @searched && r.errors.any? %>
+  <div class="form-errors">
+    <ul>
+      <% r.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% if !@searched || r.account.nil? || r.errors.attribute_names.intersect?(%i[to customer vendor]) %>
+  <%# nothing to list until there is a search that makes sense %>
+<% elsif r.lines.empty? %>
+  <p class="empty-state">Nothing on <%= r.account.name %><%= " for #{r.customer.name}" if r.customer %><%= " with no customer" if r.no_customer? %><%= " from #{r.vendor.name}" if r.vendor %> in those dates.</p>
+<% else %>
+  <%= form_with scope: :recoding, url: recoding_path, method: :post, data: { controller: "checklist" } do |f| %>
+    <%= f.hidden_field :account_id, value: r.account_id %>
+    <%= f.hidden_field :from, value: r.from&.iso8601 %>
+    <%= f.hidden_field :to,   value: r.to&.iso8601 %>
+    <%= f.hidden_field :customer_id, value: r.customer_id if r.customer_id.present? %>
+    <%= f.hidden_field :vendor_id,   value: r.vendor_id   if r.vendor_id %>
+
+    <table class="data-table recode-table">
+      <thead>
+        <tr>
+          <th class="recode-tick"><input type="checkbox" checked aria-label="Tick every line" data-checklist-target="all" data-action="checklist#toggleAll"></th>
+          <th>Date</th>
+          <th>Transaction</th>
+          <th>Customer</th>
+          <th>Line</th>
+          <th class="num">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% r.lines.each do |line| %>
+          <% document = line.document %>
+          <tr>
+            <td class="recode-tick">
+              <%= check_box_tag "recoding[line_keys][]", line.key, r.chosen?(line), id: nil, "aria-label": "#{document.title}, #{line.description}",
+                    data: { checklist_target: "box", action: "checklist#refresh" } %>
+            </td>
+            <td><%= document.date.iso8601 %></td>
+            <td><%= link_to document.title, document_path_for(document) %><%= " (draft)" if document.draft? %></td>
+            <td class="recode-customer">
+              <% if (customer = document.customer) %>
+                <%= link_to customer.name, contact_path(customer) %>
+                <% if document.billable? && (invoice = document.billed_on) %>
+                  <span class="muted">on <%= link_to invoice.label, document_path_for(invoice) %></span>
+                <% end %>
+              <% elsif document.invoice? %>
+                <%= document.party_name %>
+              <% end %>
+            </td>
+            <td>
+              <%= line.description %>
+              <%# Billing is the document's: say when this line is not all of it. %>
+              <% if document.billable? && document.line_items.size > 1 %><span class="muted">1 of <%= document.line_items.size %> lines</span><% end %>
+            </td>
+            <td class="num"><%= number_to_currency(line.amount) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5"><%= pluralize(r.lines.size, "line") %></th>
+          <th class="num"><%= number_to_currency(r.total) %></th>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="app-form filter-bar" style="margin-top:16px;">
+      <div class="field" style="flex:1 1 240px;">
+        <%= f.label :to_account_id, "Move to" %>
+        <%= f.collection_select :to_account_id, @to_accounts, :id, account_label, { selected: r.to_account_id, include_blank: "Leave the account as it is" } %>
+      </div>
+      <div class="field" style="flex:1 1 200px;">
+        <%= f.label :bill_to, "Bill to" %>
+        <%= f.select :bill_to, [ [ "Not billable", Recoding::NONE ] ] + @customers.map { |c| [ c.name, c.id ] }, { selected: r.bill_to, include_blank: "Leave billing as it is" } %>
+      </div>
+      <%= f.submit "Apply to ticked lines", class: "btn btn-primary", data: { checklist_target: "submit", turbo_confirm: "Apply this to the ticked lines?" } %>
+    </div>
+    <p class="muted" style="margin:8px 0 0;font-size:12px;max-width:70ch;">
+      <span data-checklist-target="count"><%= r.chosen_lines.size %></span> of <%= r.lines.size %> ticked.
+      Moving posts each transaction again as if it had been coded that way from the start. Billing flags the whole expense or bill for the customer's next invoice; a cost already on an invoice keeps its customer, and invoices, deposits and journals are passed over.
+    </p>
+  <% end %>
+<% end %>
