@@ -42,6 +42,7 @@
       <tr>
         <th>Date</th>
         <th>Transaction</th>
+        <th>Customer</th>
         <th>Line</th>
         <th class="num">Amount</th>
       </tr>
@@ -51,6 +52,13 @@
         <tr>
           <td><%= line.document.date.iso8601 %></td>
           <td><%= link_to line.document.title, document_path_for(line.document) %><%= " (draft)" if line.document.draft? %></td>
+          <td class="reclass-customer">
+            <% if (customer = line.document.customer) %>
+              <%= link_to customer.name, contact_path(customer) %>
+            <% elsif line.document.invoice? %>
+              <%= line.document.party_name %>
+            <% end %>
+          </td>
           <td><%= line.description %></td>
           <td class="num"><%= number_to_currency(line.amount) %></td>
         </tr>
@@ -58,7 +66,7 @@
     </tbody>
     <tfoot>
       <tr>
-        <th colspan="3"><%= pluralize(r.lines.size, "line") %></th>
+        <th colspan="4"><%= pluralize(r.lines.size, "line") %></th>
         <th class="num"><%= number_to_currency(r.total) %></th>
       </tr>
     </tfoot>

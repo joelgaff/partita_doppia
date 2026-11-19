@@ -62,7 +62,7 @@ class Reclassification
 
   def document_lines
     LineItem.where(lineable_type: "Document", lineable_id: documents.select(:id), account_id: from_account_id)
-            .includes(:lineable).map { |li| Line.new(li, li.lineable, li.description, li.amount) }
+            .includes(lineable: %i[contact billable_to documentable]).map { |li| Line.new(li, li.lineable, li.description, li.amount) }
   end
 
   def journal_lines

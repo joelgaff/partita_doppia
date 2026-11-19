@@ -51,6 +51,21 @@ class ReclassificationsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "each line names the customer: who a cost is billed to, who an invoice is for" do
+    northwind = @org.contacts.create!(name: "Northwind", kind: "customer")
+    acme      = @org.contacts.create!(name: "Acme", kind: "customer")
+    ar        = Plutus::Asset.create!(tenant: @org, name: "AR", code: "1200")
+    billed    = create_expense(@org, amount: 15, category: @travel, bank_account: @bank, vendor: "Uber", date: Date.new(2026, 4, 6), billable_to: northwind)
+    invoice   = create_invoice(@org, contact: acme, amount: 80, receivable: ar, revenue: @travel, date: Date.new(2026, 4, 7))
+
+    get new_reclassification_path(chosen)
+    assert_select "table.data-table thead th", text: "Customer"
+    rows = css_select("table.data-table tbody tr")
+    assert_equal [ "", "Northwind", "Acme" ], rows.map { |r| r.css("td.reclass-customer").text.strip }
+    assert_select "td.reclass-customer a[href=?]", contact_path(northwind)
+    assert_select "tfoot th[colspan='4']"
+  end
+
   test "nothing in range says so, with nothing to press" do
     get new_reclassification_path(chosen(from: "2025-01-01", to: "2025-01-31"))
     assert_select ".empty-state", text: /Nothing on Travel/

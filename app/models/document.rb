@@ -119,6 +119,9 @@ class Document < ApplicationRecord
     organization.documents.find_by(id: copied_from_id) if copied_from_id.present?
   end
 
+  # The customer this concerns: who an invoice is for, or who a cost is flagged to be billed to.
+  def customer = invoice? ? contact : billable_to
+
   def counterparty = contact&.name.presence || party_name
   def display_name = counterparty.presence || memo.to_s.truncate(40).presence || label
 
