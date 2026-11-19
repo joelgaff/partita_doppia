@@ -94,12 +94,14 @@ class BankTransactionsController < ApplicationController
         other = org.bank_transactions.find(params[:target_id]).bank_account
         Reconciliation::CreateTransfer.new(@txn, other_bank_account: other).call
       when "rule"
-        org.bank_rules.find(params[:target_id]).apply!(@txn)
+        org.bank_rules.find(params[:target_id]).apply!(@txn, billable_to: params[:billable_to])
       when "memory"
         # Re-read the books rather than trust the page: the coding must still be confident.
         hit = Reconciliation::Memory.new(org, [ @txn ]).for(@txn)
         raise Reconciliation::MatchDocument::Mismatch, "the books no longer agree on this payee; use Create" unless hit&.confident?
-        Reconciliation::Categorize.new(@txn, **hit.coding, via: "memory").call
+        # The row's "Bill to" is the say for this line, empty included; without one, last time's stands.
+        coding = params.key?(:billable_to) ? hit.coding.merge(billable_to: params[:billable_to]) : hit.coding
+        Reconciliation::Categorize.new(@txn, **coding, via: "memory").call
       else
         raise Reconciliation::MatchDocument::Mismatch, "unknown suggestion"
       end

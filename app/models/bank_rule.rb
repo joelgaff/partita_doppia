@@ -58,12 +58,12 @@ class BankRule < ApplicationRecord
   end
 
   # Do what the rule says to this line.
-  def apply!(txn, source: "reconcile")
+  def apply!(txn, source: "reconcile", billable_to: nil)
     if action_kind == "Transfer"
       Reconciliation::CreateTransfer.new(txn, other_bank_account: transfer_bank_account, source: source).call
     else
       Reconciliation::Categorize.new(txn, account: account, tax_rate: tax_rate, contact_name: contact&.name,
-                                     tracking_option_ids: tracking_option_ids, source: source).call
+                                     tracking_option_ids: tracking_option_ids, billable_to: billable_to, source: source).call
     end
   end
 

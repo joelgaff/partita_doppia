@@ -85,7 +85,8 @@
   and tracking copied, account from `OrganizationSettings#billable_income_account` or the cost's
   own); `Contacts::BillableExpensesController` renders them as templates in a Turbo frame under the
   invoice form, and `billable_controller.js` hands a ticked cost's rows to the line-items controller.
-  Reconcile's Create panel and `Memory` carry `billable_to` too. Gross method: the cost stays an
+  Reconcile's Create panel and `Memory` carry `billable_to` too, and a rule or memory suggestion's
+  OK has its own "Bill to" field (`Suggestion#makes_a_cost?`), prefilled from memory; what the row says wins, empty included. Gross method: the cost stays an
   expense, the invoice line is revenue.
 
 ## Chart of accounts
