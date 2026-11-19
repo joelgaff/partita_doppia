@@ -1,0 +1,75 @@
+<header class="page-header">
+  <h1>Reclassify</h1>
+</header>
+
+<% r = @reclassification %>
+<% account_label = ->(a) { "#{a.code.present? ? "#{a.code} — " : ""}#{a.name} (#{a.type.demodulize})#{' (archived)' if a.archived?}" } %>
+<p class="muted" style="margin:0 0 12px;font-size:13px;max-width:70ch;">
+  Moves every line coded to one account, between two dates, onto another. Each transaction posts again as if it had been coded that way from the start, and its history notes the move. Leave a date empty for no limit on that side.
+</p>
+
+<%= form_with url: new_reclassification_path, method: :get, class: "app-form filter-bar" do |f| %>
+  <div class="field" style="flex:1 1 240px;">
+    <%= f.label :from_account_id, "Move lines on" %>
+    <%= f.collection_select :from_account_id, @from_accounts, :id, account_label, { selected: r.from_account_id, include_blank: "Choose an account" } %>
+  </div>
+  <div class="field" style="flex:1 1 240px;">
+    <%= f.label :to_account_id, "To" %>
+    <%= f.collection_select :to_account_id, @to_accounts, :id, account_label, { selected: r.to_account_id, include_blank: "Choose an account" } %>
+  </div>
+  <div class="field">
+    <%= f.label :from, "Dated from" %>
+    <%= f.date_field :from, value: r.from %>
+  </div>
+  <div class="field">
+    <%= f.label :to, "Through" %>
+    <%= f.date_field :to, value: r.to %>
+  </div>
+  <%= f.submit "Preview", class: "btn btn-secondary", name: nil %>
+<% end %>
+
+<% if @chosen && r.errors.any? %>
+  <div class="form-errors">
+    <ul>
+      <% r.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
+    </ul>
+  </div>
+<% elsif @chosen && r.lines.empty? %>
+  <p class="empty-state">Nothing on <%= r.from_account.name %> in those dates.</p>
+<% elsif @chosen %>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Transaction</th>
+        <th>Line</th>
+        <th class="num">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% r.lines.each do |line| %>
+        <tr>
+          <td><%= line.document.date.iso8601 %></td>
+          <td><%= link_to line.document.title, document_path_for(line.document) %><%= " (draft)" if line.document.draft? %></td>
+          <td><%= line.description %></td>
+          <td class="num"><%= number_to_currency(line.amount) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="3"><%= pluralize(r.lines.size, "line") %></th>
+        <th class="num"><%= number_to_currency(r.total) %></th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <%= form_with scope: :reclassification, url: reclassification_path, method: :post, class: "form-actions", style: "margin-top:16px;" do |f| %>
+    <%= f.hidden_field :from_account_id, value: r.from_account_id %>
+    <%= f.hidden_field :to_account_id,   value: r.to_account_id %>
+    <%= f.hidden_field :from, value: r.from&.iso8601 %>
+    <%= f.hidden_field :to,   value: r.to&.iso8601 %>
+    <%= f.submit "Move #{pluralize(r.lines.size, "line")}", class: "btn btn-primary",
+          data: { turbo_confirm: "Move #{pluralize(r.lines.size, 'line')} from #{r.from_account.name} to #{r.to_account.name}?" } %>
+  <% end %>
+<% end %>

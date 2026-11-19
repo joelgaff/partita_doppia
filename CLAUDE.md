@@ -103,6 +103,13 @@
   refuses a new line or a line moved onto one, and leaves existing lines alone. Importers
   (`Imports::BaseService` subclasses) run with `Current.importing` set and are let through.
 
+- Bulk recoding is `Reclassification` (a form object; `ReclassificationsController`, reached from
+  the chart and the general ledger): every `LineItem` and `JournalLine` on one account, on live
+  documents between two dates, moves to another account; each document reposts and gets a
+  `reclassified` history line. The GET page previews, the POST moves, all or nothing. Control legs
+  (bank, receivables, payables) are not lines and never move; bank rules and recurring invoices
+  keep the account they name.
+
 ## Share links
 - An approved invoice can carry one public link (`DocumentShare`, `has_one :share` through the
   `Shareable` concern on `Document`): the record being there is what "shared" means. The token is

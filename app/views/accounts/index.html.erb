@@ -1,6 +1,7 @@
 <header class="page-header">
   <h1>Chart of Accounts</h1>
   <div style="display:flex;gap:8px;">
+    <%= link_to "Reclassify", new_reclassification_path, class: "btn btn-secondary" %>
     <%= link_to "Import CSV", new_chart_of_accounts_import_path, class: "btn btn-secondary" %>
     <%= link_to "Add account", new_account_path, class: "btn btn-primary" %>
   </div>

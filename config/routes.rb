@@ -42,6 +42,7 @@ Rails.application.routes.draw do
   resources :accounts, only: %i[index new create] do
     member { post :archive; post :restore }
   end
+  resource :reclassification, only: %i[new create]
   resources :bank_accounts, except: :destroy do
     member do
       post :archive
