@@ -10,6 +10,7 @@ module ApplicationHelper
     deposits:  %(<path d="M8 13.5v-8M5 8.5 8 5.5l3 3"/><path d="M2.5 13.5h11"/>),
     transfers: %(<path d="M2.5 5.5h9l-2.5-2.5M13.5 10.5h-9l2.5 2.5"/>),
     journal:   %(<path d="M4 2.5h8v11H4z"/><path d="M4 5h-1.5M4 8h-1.5M4 11h-1.5"/><path d="M6.5 6h3M6.5 9h3"/>),
+    ledger:    %(<path d="M3 2.5h10v11H3z"/><path d="M8 2.5v11M5 5.5h1.5M5 8h1.5M9.5 5.5H11M9.5 8H11"/>),
     accounts:  %(<path d="M8 2 14 5.5H2z"/><path d="M4 7v4.5M8 7v4.5M12 7v4.5"/><path d="M2.5 13.5h11"/>),
     banking:   %(<rect x="2" y="4" width="12" height="8.5" rx="1.5"/><path d="M2 7h12"/><path d="M4.5 10.5h3"/>),
     reports:   %(<path d="M2.5 2.5v11h11"/><path d="M5 11 7.5 7.5l2.5 2 3-4.5"/>),
@@ -149,8 +150,9 @@ module ApplicationHelper
 
   # Sidebar entry: icon + label, marked active when the current controller is one
   # of the sections it covers.
-  def nav_item(label, path, icon:, sections: nil)
-    active = nav_active?(sections || icon)
+  # `except` names sections under it that have an entry of their own.
+  def nav_item(label, path, icon:, sections: nil, except: nil)
+    active = nav_active?(sections || icon) && !nav_active?(except)
     link_to(path, class: ("active" if active), "aria-current": ("page" if active), title: label) do
       safe_join([ nav_icon(icon), tag.span(label) ])
     end

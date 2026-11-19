@@ -93,7 +93,11 @@
 - Accounts are `Plutus::Account` rows scoped by `tenant`; the app's additions are mixed in from
   `config/initializers/plutus_bank_accounts.rb` (`AccountArchiving`, the `bank_account` link).
   `AccountsController` lists the chart, adds an account by hand (type, name, code, description) and
-  archives or restores one; bank accounts and cards are added under Banking.
+  archives or restores one; bank accounts and cards are added under Banking. The page's search box
+  is the contacts' one: the `search` Stimulus controller driving a Turbo frame, over a `matching`
+  scope from the `Searchable` concern (`searchable_by :name, :code, :description`).
+  An account's name opens its general ledger (`Reports::GeneralLedgersController`, in the sidebar
+  under its own name), and a ledger row opens the document behind it (`entry_path_for`).
 - Archiving (`archived_at`) hides an account from pickers and nothing else: postings, balances and
   reports keep it. Every picker query ends in `.active`; a line already on an archived account keeps
   it through an edit (`with_chosen_account`). `archive_blocker` names what still depends on an

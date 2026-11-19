@@ -39,7 +39,7 @@
       <% @report.lines.each do |l| %>
         <tr>
           <td><%= l.date&.iso8601 %></td>
-          <td><%= l.description %></td>
+          <td><%= link_to_if entry_path_for(l.entry.commercial_document), l.description, entry_path_for(l.entry.commercial_document) %></td>
           <td class="num"><%= l.debit.positive?  ? "$#{number_with_precision(l.debit,  precision: 2, delimiter: ',')}" : "" %></td>
           <td class="num"><%= l.credit.positive? ? "$#{number_with_precision(l.credit, precision: 2, delimiter: ',')}" : "" %></td>
           <td class="num">$<%= number_with_precision(l.running_balance, precision: 2, delimiter: ",") %></td>

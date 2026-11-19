@@ -41,7 +41,10 @@ class AccountsController < ApplicationController
   end
 
   def load_chart
-    accounts  = Current.organization.plutus_accounts.includes(:bank_account).order(:code, :name).to_a
+    @q        = params[:q].to_s.strip
+    accounts  = Current.organization.plutus_accounts.includes(:bank_account).order(:code, :name)
+    accounts  = accounts.matching(@q) if @q.present?
+    accounts  = accounts.to_a
     @archived = accounts.select(&:archived?)
     @grouped  = (accounts - @archived).group_by { |a| a.type.demodulize }.sort_by { |type, _| TYPES.index(type) || TYPES.size }
   end
