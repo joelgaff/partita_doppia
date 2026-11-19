@@ -28,6 +28,11 @@ that worked and own the rest.
   down; for the rest, the books remember how a payee was coded before and,
   after three agreeing codings, offer that on one tap too. Every match is
   undoable, and every document says in its history how it came to be.
+- **Recode in bulk.** Reclassify, on the chart of accounts and the general
+  ledger, moves every line coded to one account between two dates onto
+  another: pick the two accounts and the dates, preview what would move, then
+  move it. Each transaction posts again as if it had been coded that way from
+  the start and notes the move in its history. To undo, run it the other way.
 - **Tracking categories** the way Xero does them: up to two active categories,
   one option per category on any line, and a profit and loss broken out by
   option.
