@@ -10,8 +10,8 @@ module Reports
 
     def lines
       @lines ||= begin
-        debits  = Plutus::DebitAmount.where(account_id: account.id).includes(:entry)
-        credits = Plutus::CreditAmount.where(account_id: account.id).includes(:entry)
+        debits  = Plutus::DebitAmount.where(account_id: account.id).includes(entry: :commercial_document)
+        credits = Plutus::CreditAmount.where(account_id: account.id).includes(entry: :commercial_document)
 
         rows = (debits.map { |a| [ :debit, a ] } + credits.map { |a| [ :credit, a ] })
                  .filter { |_, a| in_window?(a.entry) }

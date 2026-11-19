@@ -7,7 +7,8 @@
   <%= nav_item "Journal",   journal_entries_path, icon: :journal %>
   <%= nav_item "Accounts",  accounts_path,        icon: :accounts %>
   <%= nav_item "Banking",   bank_accounts_path,   icon: :banking %>
-  <%= nav_item "Reports",   reports_path,         icon: :reports %>
+  <%= nav_item "General Ledger", reports_general_ledger_path, icon: :ledger, sections: %w[reports/general_ledgers] %>
+  <%= nav_item "Reports",   reports_path,         icon: :reports,   except: %w[reports/general_ledgers] %>
   <%= nav_item "Settings",  settings_path,        icon: :settings %>
   <% if hotwire_native_app? %><%= nav_item "App settings", "/app/settings", icon: :settings %><% end %>
 </nav>
