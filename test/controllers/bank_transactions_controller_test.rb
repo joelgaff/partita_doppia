@@ -245,6 +245,48 @@ class BankTransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal northwind, fresh.reload.document.billable_to
   end
 
+  test "a memory OK takes a customer to bill: last time's by default, another or none when said" do
+    northwind = @org.contacts.create!(name: "Northwind", kind: "customer")
+    3.times { |i| coded("DELTA AIR 00#{i}", account: @hosting, on: Date.new(2026, 7 + i, 1), contact: "Delta", amount: -500, billable_to: "Northwind") }
+    one, two = line(-500, description: "DELTA AIR 007", on: Date.current - 2), line(-500, description: "DELTA AIR 008", on: Date.current - 1)
+
+    get bank_transactions_path
+    assert_select "##{row_id(one)} .suggestion form[action=?]", accept_suggestion_bank_transaction_path(one) do
+      assert_select "input[name=billable_to][value=Northwind][list]"
+      assert_select "input[name=kind][value=memory]"
+    end
+
+    post accept_suggestion_bank_transaction_path(one), params: { kind: "memory", billable_to: "Contoso" }, as: :turbo_stream
+    assert_response :success
+    assert_equal "Contoso", one.reload.document.billable_to.name
+    assert @org.contacts.find_by!(name: "Contoso").customer?
+
+    post accept_suggestion_bank_transaction_path(two), params: { kind: "memory", billable_to: "" }, as: :turbo_stream
+    assert_response :success
+    assert_nil two.reload.document.billable_to, "emptied on the row means not billable this time"
+  end
+
+  test "a rule's OK takes a customer to bill too; deposits, transfers and document matches don't ask" do
+    cf = @org.contacts.create!(name: "Cloudflare", kind: "vendor")
+    rule = @org.bank_rules.create!(name: "CF", match_kind: "contains", pattern: "cloudflare", amount_sign: "any", action_kind: "Expense", account: @hosting, contact: cf)
+    out = line(-8, payee: "CLOUDFLARE")
+    inn = line(8, payee: "CLOUDFLARE REFUND")
+    invoice = create_invoice(@org, client_name: "Acme", amount: 75, receivable: @ar, revenue: @sales)
+    paid = line(75, description: "ACME ACH")
+
+    get bank_transactions_path
+    assert_select "##{row_id(out)} .suggestion input[name=billable_to]:not([value])"
+    assert_select "##{row_id(inn)} .suggestion .btn", text: "OK"
+    assert_select "##{row_id(inn)} .suggestion input[name=billable_to]", 0
+    assert_select "##{row_id(paid)} .suggestion input[name=target_id][value=?]", invoice.id.to_s
+    assert_select "##{row_id(paid)} .suggestion input[name=billable_to]", 0
+
+    post accept_suggestion_bank_transaction_path(out), params: { kind: "rule", target_id: rule.id, billable_to: "Northwind" }, as: :turbo_stream
+    assert_response :success
+    assert_equal "Northwind", out.reload.document.billable_to.name
+    assert_equal @hosting, out.document.line_items.first.account
+  end
+
   test "the create panel insists on a vendor" do
     txn = line(-48, description: "BLUEPIXEL HOSTING 10/02")
     get bank_transactions_path

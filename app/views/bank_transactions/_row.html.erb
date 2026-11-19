@@ -27,7 +27,16 @@
                 <span class="suggestion-text">→ <%= suggestion.label %></span>
                 <%= coding_chips(suggestion.coding) %>
               </div>
-              <%= button_to "OK", accept_suggestion_bank_transaction_path(txn), params: { kind: suggestion.kind, target_id: suggestion.target&.id }.compact, class: "btn btn-primary" %>
+              <%= form_with url: accept_suggestion_bank_transaction_path(txn), method: :post, class: "suggestion-accept" do |f| %>
+                <%= f.hidden_field :kind, value: suggestion.kind, id: nil %>
+                <%= f.hidden_field :target_id, value: suggestion.target.id, id: nil if suggestion.target %>
+                <% if suggestion.makes_a_cost?(txn) %>
+                  <%# A cost made from here can be flagged for a customer without opening the Expense panel. %>
+                  <%= f.text_field :billable_to, value: suggestion.data&.billable_to_name, id: nil, list: dom_id(Current.organization, :contact_names),
+                        placeholder: "Bill to", "aria-label": "Customer to bill this to (optional)", autocomplete: "off" %>
+                <% end %>
+                <button type="submit" class="btn btn-primary">OK</button>
+              <% end %>
             </div>
           <% end %>
           <div class="segments" role="tablist">

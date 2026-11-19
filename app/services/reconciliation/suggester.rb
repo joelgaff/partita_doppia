@@ -6,6 +6,8 @@ module Reconciliation
   class Suggester
     Suggestion = Struct.new(:kind, :target, :score, :label, :data, :coding, keyword_init: true) do
       def confident? = score >= 100
+      # Accepting it writes a new expense, which may be flagged for a customer to be billed.
+      def makes_a_cost?(txn) = txn.withdrawal? && (kind == :memory || (kind == :rule && target.action_kind != "Transfer"))
     end
     MEMORY_CONFIDENT = 100
     MEMORY_HINT      = 30
