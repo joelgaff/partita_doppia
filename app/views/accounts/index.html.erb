@@ -6,4 +6,12 @@
   </div>
 </header>
 
-<%= render "accounts/chart" %>
+<%# Search drives the chart through a frame: only the tables redraw, the box keeps its text and focus. %>
+<%= form_with url: accounts_path, method: :get, class: "search-bar", data: { controller: "search", turbo_frame: dom_id(Current.organization, :accounts), turbo_action: "advance" } do |f| %>
+  <%= f.search_field :q, value: @q, placeholder: "Search name, code or description", autocomplete: "off",
+        data: { action: "input->search#submit" }, "aria-label": "Search accounts" %>
+<% end %>
+
+<%= turbo_frame_tag dom_id(Current.organization, :accounts), target: "_top" do %>
+  <%= render "accounts/chart" %>
+<% end %>

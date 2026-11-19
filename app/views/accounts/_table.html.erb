@@ -26,9 +26,9 @@
           <% if account.bank_account %>
             <%# A bank account's ledger side is archived and restored from Banking, through the badge beside its name. %>
           <% elsif account.archived? %>
-            <%= button_to "Restore", restore_account_path(account), class: "btn btn-secondary", form: { class: "inline-form", data: { turbo_stream: true } } %>
+            <%= button_to "Restore", restore_account_path(account), params: { q: @q.presence }.compact, class: "btn btn-secondary", form: { class: "inline-form", data: { turbo_stream: true } } %>
           <% else %>
-            <%= button_to "Archive", archive_account_path(account), class: "btn btn-secondary", form: { class: "inline-form", data: { turbo_stream: true } } %>
+            <%= button_to "Archive", archive_account_path(account), params: { q: @q.presence }.compact, class: "btn btn-secondary", form: { class: "inline-form", data: { turbo_stream: true } } %>
           <% end %>
         </td>
       </tr>
