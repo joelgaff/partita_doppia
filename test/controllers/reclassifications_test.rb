@@ -66,6 +66,34 @@ class ReclassificationsTest < ActionDispatch::IntegrationTest
     assert_select "tfoot th[colspan='4']"
   end
 
+  test "a customer can be chosen, narrows the preview, and is carried into the move" do
+    ironman = @org.contacts.create!(name: "IRONMAN", kind: "customer")
+    @org.contacts.create!(name: "Delta Vendor", kind: "vendor")
+    billed  = create_expense(@org, amount: 15, category: @travel, bank_account: @bank, vendor: "Chipotle", date: Date.new(2026, 4, 6), billable_to: ironman)
+
+    get new_reclassification_path
+    assert_select "form[method=get] select[name=customer_id]" do
+      assert_select "option", text: "Any customer"
+      assert_select "option[value=?]", ironman.id.to_s, text: "IRONMAN"
+      assert_select "option", text: "Delta Vendor", count: 0
+    end
+
+    get new_reclassification_path(chosen(customer_id: ironman.id))
+    assert_select "form[method=get] select[name=customer_id] option[selected][value=?]", ironman.id.to_s
+    assert_select "table.data-table tbody tr", count: 1
+    assert_select "table.data-table a[href=?]", expense_path(billed)
+    assert_select "form[action=?] input[type=hidden][name='reclassification[customer_id]'][value=?]", reclassification_path, ironman.id.to_s
+    assert_select "input[type=submit][data-turbo-confirm=?]", "Move 1 line for IRONMAN from Travel to Reimbursable Expenses?"
+
+    post reclassification_path, params: { reclassification: chosen(customer_id: ironman.id) }
+    assert_equal "1 line for IRONMAN moved from Travel to Reimbursable Expenses.", flash[:notice]
+    assert_equal @reimb,  billed.reload.line_items.first.account
+    assert_equal @travel, @april.reload.line_items.first.account
+
+    get new_reclassification_path(chosen(customer_id: ironman.id, from: "2025-01-01", to: "2025-01-31"))
+    assert_select ".empty-state", text: /Nothing on Travel for IRONMAN/
+  end
+
   test "nothing in range says so, with nothing to press" do
     get new_reclassification_path(chosen(from: "2025-01-01", to: "2025-01-31"))
     assert_select ".empty-state", text: /Nothing on Travel/

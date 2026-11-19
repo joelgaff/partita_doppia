@@ -110,7 +110,8 @@
 
 - Bulk recoding is `Reclassification` (a form object; `ReclassificationsController`, reached from
   the chart and the general ledger): every `LineItem` and `JournalLine` on one account, on live
-  documents between two dates, moves to another account; each document reposts and gets a
+  documents between two dates (and, when a customer is chosen, only that customer's documents,
+  `Document.for_customer`), moves to another account; each document reposts and gets a
   `reclassified` history line. The GET page previews, the POST moves, all or nothing. Control legs
   (bank, receivables, payables) are not lines and never move; bank rules and recurring invoices
   keep the account they name.

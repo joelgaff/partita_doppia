@@ -60,6 +60,34 @@ class ReclassificationTest < ActiveSupport::TestCase
     assert_equal 1, reclass(to: "2026-03-31").lines.size
   end
 
+  test "a customer narrows it to their costs and their invoices; journals have no customer" do
+    ironman = @org.contacts.create!(name: "IRONMAN", kind: "customer")
+    other   = @org.contacts.create!(name: "Northwind", kind: "customer")
+    ar      = Plutus::Asset.create!(tenant: @org, name: "AR", code: "1200")
+    theirs  = create_expense(@org, amount: 30, category: @travel, bank_account: @bank, vendor: "Chipotle", date: Date.new(2026, 4, 8), billable_to: ironman)
+    late    = create_expense(@org, amount: 35, category: @travel, bank_account: @bank, vendor: "Chipotle", date: Date.new(2026, 6, 8), billable_to: ironman)
+    create_expense(@org, amount: 20, category: @travel, bank_account: @bank, vendor: "Subway", date: Date.new(2026, 4, 9), billable_to: other)
+    invoice = create_invoice(@org, contact: ironman, amount: 80, receivable: ar, revenue: @travel, date: Date.new(2026, 4, 10))
+    create_expense(@org, amount: 12, category: @travel, bank_account: @bank, contact: ironman, date: Date.new(2026, 4, 11))   # paid to them, not billed to them
+
+    r = reclass(from: "2026-04-01", to: "2026-04-30", customer_id: ironman.id)
+    assert r.valid?
+    assert_equal ironman, r.customer
+    assert_equal [ theirs, invoice ], r.lines.map(&:document)
+    assert_equal 2, r.apply!
+    assert_equal @reimb,  theirs.reload.line_items.first.account
+    assert_equal @travel, late.reload.line_items.first.account
+    assert_equal @travel, @april.reload.line_items.first.account
+    assert_equal @travel, @journal.reload.journal_entry.lines.first.account
+  end
+
+  test "a customer from elsewhere, or one that is gone, is refused rather than ignored" do
+    theirs = Organization.create!(name: "Elsewhere").contacts.create!(name: "IRONMAN", kind: "customer")
+    assert_not reclass(customer_id: theirs.id).valid?
+    assert_not reclass(customer_id: 0).valid?
+    assert_raises(ActiveRecord::RecordInvalid) { reclass(customer_id: theirs.id).apply! }
+  end
+
   test "drafts move too; voided documents are left as they were" do
     draft = create_bill(@org, amount: 10, category: @travel, payable: @ap, vendor: "Lyft", date: Date.new(2026, 4, 21), state: "draft")
     @april.void!

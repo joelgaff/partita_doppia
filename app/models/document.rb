@@ -54,6 +54,10 @@ class Document < ApplicationRecord
   scope :voided, -> { where.not(voided_at: nil) }
   scope :posted, -> { live.approved }   # on the ledger: neither draft nor voided
   scope :billable_to, ->(contact) { posted.where(billable_to: contact) }   # costs flagged for a customer
+  # Theirs as a customer: an invoice made out to them, or a cost flagged to be billed to them. See #customer.
+  scope :for_customer, ->(contact) {
+    where(documentable_type: "Invoice", contact_id: contact).or(where.not(documentable_type: "Invoice").where(billable_to_id: contact))
+  }
   scope :unbilled, -> { where.not(id: LineItem.rebilling.select(:rebills_document_id)) }   # no live invoice carries them yet
   scope :outstanding_between, ->(low, high) {
     where("(documents.total - COALESCE((SELECT SUM(payments.amount) FROM payments WHERE payments.document_id = documents.id), 0)) BETWEEN ? AND ?", low, high)
