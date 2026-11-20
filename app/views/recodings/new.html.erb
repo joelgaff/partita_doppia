@@ -30,6 +30,10 @@
     <%= f.label :vendor_id, "Vendor" %>
     <%= f.collection_select :vendor_id, @vendors, :id, :name, { selected: r.vendor_id, include_blank: "Any vendor" } %>
   </div>
+  <div class="field" style="flex:1 1 160px;">
+    <%= f.label :kind, "Type" %>
+    <%= f.select :kind, [ [ "Invoices only", "invoices" ], [ "Expenses and bills only", "costs" ] ], { selected: r.kind, include_blank: "Any type" } %>
+  </div>
   <%= f.submit "Find", class: "btn btn-secondary", name: nil %>
 <% end %>
 
@@ -41,10 +45,10 @@
   </div>
 <% end %>
 
-<% if !@searched || r.account.nil? || r.errors.attribute_names.intersect?(%i[to customer vendor]) %>
+<% if !@searched || r.account.nil? || r.errors.attribute_names.intersect?(%i[to customer vendor kind]) %>
   <%# nothing to list until there is a search that makes sense %>
 <% elsif r.lines.empty? %>
-  <p class="empty-state">Nothing on <%= r.account.name %><%= " for #{r.customer.name}" if r.customer %><%= " with no customer" if r.no_customer? %><%= " from #{r.vendor.name}" if r.vendor %> in those dates.</p>
+  <p class="empty-state">Nothing on <%= r.account.name %><%= { "invoices" => " among invoices", "costs" => " among expenses and bills" }[r.kind] %><%= " for #{r.customer.name}" if r.customer %><%= " with no customer" if r.no_customer? %><%= " from #{r.vendor.name}" if r.vendor %> in those dates.</p>
 <% else %>
   <%= form_with scope: :recoding, url: recoding_path, method: :post, data: { controller: "checklist" } do |f| %>
     <%= f.hidden_field :account_id, value: r.account_id %>
@@ -52,6 +56,7 @@
     <%= f.hidden_field :to,   value: r.to&.iso8601 %>
     <%= f.hidden_field :customer_id, value: r.customer_id if r.customer_id.present? %>
     <%= f.hidden_field :vendor_id,   value: r.vendor_id   if r.vendor_id %>
+    <%= f.hidden_field :kind,        value: r.kind        if r.kind.present? %>
 
     <table class="data-table recode-table">
       <thead>

@@ -1,5 +1,5 @@
 # Find and recode. Find the lines on one account (document lines and journal
-# lines), narrowed by dates, customer and vendor; choose among them; then move
+# lines), narrowed by dates, customer, vendor and kind of document; choose among them; then move
 # them to another account, flag their documents as billable to a customer, or
 # both. All of it or none of it.
 #
@@ -17,6 +17,9 @@ class Recoding
 
   NONE = "none"   # as a customer to find: nobody yet; as a customer to bill: not billable
 
+  # Kinds of document to find, by the types each takes in; blank finds any.
+  KINDS = { "invoices" => %w[Invoice], "costs" => %w[Expense Bill] }.freeze
+
   Line = Struct.new(:record, :document, :description, :amount) do
     def key = "#{record.class.model_name.singular}_#{record.id}"
   end
@@ -29,6 +32,7 @@ class Recoding
   attribute :to,          :date
   attribute :customer_id, :string    # a contact's id, NONE, or blank for anyone
   attribute :vendor_id,   :integer
+  attribute :kind,        :string    # a key of KINDS, or blank for any
   # which of them: nil is all of them, a list is those and no others
   attribute :line_keys
   # what to do
@@ -38,6 +42,7 @@ class Recoding
   validates :account, presence: { message: "must be chosen" }
   validate  :dates_in_order
   validate  :people_known
+  validates :kind, inclusion: { in: KINDS.keys, message: "is not a kind of document to find" }, allow_blank: true
   with_options on: :apply do
     validate :something_to_do
     validate :something_chosen
@@ -115,6 +120,7 @@ class Recoding
     scope = scope.where(date: from..) if from
     scope = scope.where(date: ..to)   if to
     scope = scope.where(contact_id: vendor_id) if vendor_id
+    scope = scope.where(documentable_type: KINDS.fetch(kind)) if KINDS.key?(kind)
     scope = scope.without_customer             if no_customer?
     scope = scope.for_customer(customer_id)    if customer_id.present? && !no_customer?
     scope
