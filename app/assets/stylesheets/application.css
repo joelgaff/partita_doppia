@@ -1260,6 +1260,7 @@ input[type="file"]::file-selector-button:hover { background: rgba(41, 74, 120, 0
 .coding .hue-11 { --hue: var(--hue-11); }
 /* The why someone typed, under the name it belongs to. */
 .why { display: block; font-size: 11.5px; color: var(--dim); margin-top: 2px; }
+.chart-billed-as { margin-left: 8px; font-size: 11.5px; white-space: nowrap; }
 .recode-tick { width: 28px; }
 .recode-table td .muted { display: block; font-size: 11.5px; }
 .suggestion form { margin: 0; flex: none; display: flex; gap: 6px; align-items: center; }

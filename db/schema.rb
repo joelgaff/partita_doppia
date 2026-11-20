@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_100000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -351,6 +351,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
     t.text "description"
     t.string "xero_type"
     t.datetime "archived_at"
+    t.integer "billing_income_account_id"
+    t.index ["billing_income_account_id"], name: "index_plutus_accounts_on_billing_income_account_id"
     t.index ["name", "type"], name: "index_plutus_accounts_on_name_and_type"
     t.index ["tenant_id", "code"], name: "index_plutus_accounts_on_tenant_id_and_code", unique: true, where: "code IS NOT NULL"
     t.index ["tenant_id"], name: "index_plutus_accounts_on_tenant_id"
@@ -540,6 +542,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
   add_foreign_key "payments", "bank_transactions"
   add_foreign_key "payments", "documents"
   add_foreign_key "payments", "organizations"
+  add_foreign_key "plutus_accounts", "plutus_accounts", column: "billing_income_account_id"
   add_foreign_key "recurring_invoices", "organizations"
   add_foreign_key "tax_rates", "organizations"
   add_foreign_key "tracking_categories", "organizations"

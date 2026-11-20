@@ -1,0 +1,55 @@
+<%# New: every field, type included. Edit: the type is fixed, and an expense account also names what its costs are billed as. %>
+<% submit = account.new_record? ? "Add account" : "Save account" %>
+<%= form_with scope: :account, url: (account.new_record? ? accounts_path : account_path(account)), method: (account.new_record? ? :post : :patch),
+      class: "app-form", data: bridge_form_data(submit) do |f| %>
+  <% if account.errors.any? %>
+    <div class="form-errors">
+      <ul>
+        <% account.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :type %>
+    <% if account.new_record? %>
+      <%= f.select :type, AccountsController::TYPES, selected: params.dig(:account, :type).presence || account.type.to_s.demodulize %>
+      <p class="muted" style="margin:6px 0 0;font-size:12px;">Bank accounts and credit cards are added under <%= link_to "Banking", new_bank_account_path %>, which puts them on the chart too.</p>
+    <% else %>
+      <p style="margin:0;"><%= account.type.demodulize %> <span class="muted" style="font-size:12px;">· an account keeps the type it was made with</span></p>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <%= f.label :name %>
+    <%= f.text_field :name, value: account.name, placeholder: "Race Supplies", autofocus: account.new_record? %>
+  </div>
+
+  <div class="field">
+    <%= f.label :code, "Account code (optional)" %>
+    <%= f.text_field :code, value: account.code, placeholder: "6450" %>
+    <% if account.persisted? %>
+      <p class="muted" style="margin:6px 0 0;font-size:12px;">An import matches accounts by code, then by name: change these and the next import may add the old one again.</p>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description, "Description (optional)" %>
+    <%= f.text_area :description, value: account.description, rows: 2 %>
+  </div>
+
+  <% if account.persisted? && account.billable_cost_account? %>
+    <% fallback = Current.organization.settings.billable_income_account %>
+    <div class="field">
+      <%= f.label :billing_income_account_id, "When billed to a customer, post income to" %>
+      <%= f.collection_select :billing_income_account_id, @income_accounts, :id, ->(a) { "#{a.code.present? ? "#{a.code} — " : ""}#{a.name}" },
+            { selected: account.billing_income_account_id, include_blank: "The fallback in Settings#{" (#{[ fallback.code, fallback.name ].compact_blank.join(' ')})" if fallback}" } %>
+      <p class="muted" style="margin:6px 0 0;font-size:12px;">A cost on this account, flagged for a customer, goes on their invoice as this income account. The line can still be changed on the invoice.</p>
+    </div>
+  <% end %>
+
+  <div class="form-actions">
+    <%= f.submit submit, class: "btn btn-primary" %>
+    <%= link_to "Cancel", accounts_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

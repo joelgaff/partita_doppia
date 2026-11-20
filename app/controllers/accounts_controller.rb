@@ -1,10 +1,11 @@
 # The chart of accounts: every ledger account by type, with adding one by hand,
-# archiving one that is done with and bringing it back.
+# editing it, archiving one that is done with and bringing it back.
 class AccountsController < ApplicationController
   TYPES = %w[Asset Liability Equity Revenue Expense].freeze   # the order the chart reads in
 
   before_action :load_chart,   only: :index
-  before_action :load_account, only: %i[archive restore]
+  before_action :load_account, only: %i[edit update archive restore]
+  before_action :send_bank_accounts_to_banking, only: %i[edit update]
 
   def index; end
 
@@ -18,6 +19,22 @@ class AccountsController < ApplicationController
       redirect_to accounts_path, notice: "#{@account.name} added."
     else
       render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+    load_income_accounts
+  end
+
+  # Its type stays as it was made: changing it would move its history between reports.
+  def update
+    attrs = params.require(:account).permit(:name, :code, :description, :billing_income_account_id)
+    attrs = attrs.to_h.transform_values { |v| v.to_s.strip.presence }
+    if @account.update(attrs)
+      redirect_to accounts_path, notice: "#{@account.name} saved."
+    else
+      load_income_accounts
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -40,12 +57,22 @@ class AccountsController < ApplicationController
     @account = Current.organization.plutus_accounts.find(params[:id])
   end
 
+  # A bank account's name and number are the bank account's; its ledger side follows.
+  def send_bank_accounts_to_banking
+    redirect_to edit_bank_account_path(@account.bank_account) if @account.bank_account
+  end
+
+  def load_income_accounts
+    @income_accounts = Plutus::Revenue.where(tenant: Current.organization).active.order(:code, :name)
+  end
+
   def load_chart
     @q        = params[:q].to_s.strip
-    accounts  = Current.organization.plutus_accounts.includes(:bank_account).order(:code, :name)
+    accounts  = Current.organization.plutus_accounts.includes(:bank_account, :billing_income_account).order(:code, :name)
     accounts  = accounts.matching(@q) if @q.present?
     accounts  = accounts.to_a
     @archived = accounts.select(&:archived?)
+    load_income_accounts
     @grouped  = (accounts - @archived).group_by { |a| a.type.demodulize }.sort_by { |type, _| TYPES.index(type) || TYPES.size }
   end
 

@@ -2,38 +2,4 @@
   <h1>New account</h1>
 </header>
 
-<%= form_with scope: :account, url: accounts_path, class: "app-form", data: bridge_form_data("Add account") do |f| %>
-  <% if @account.errors.any? %>
-    <div class="form-errors">
-      <ul>
-        <% @account.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :type %>
-    <%= f.select :type, AccountsController::TYPES, selected: params.dig(:account, :type).presence || @account.type.to_s.demodulize %>
-    <p class="muted" style="margin:6px 0 0;font-size:12px;">Bank accounts and credit cards are added under <%= link_to "Banking", new_bank_account_path %>, which puts them on the chart too.</p>
-  </div>
-
-  <div class="field">
-    <%= f.label :name %>
-    <%= f.text_field :name, value: @account.name, placeholder: "Race Supplies", autofocus: true %>
-  </div>
-
-  <div class="field">
-    <%= f.label :code, "Account code (optional)" %>
-    <%= f.text_field :code, value: @account.code, placeholder: "6450" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :description, "Description (optional)" %>
-    <%= f.text_area :description, value: @account.description, rows: 2 %>
-  </div>
-
-  <div class="form-actions">
-    <%= f.submit "Add account", class: "btn btn-primary" %>
-    <%= link_to "Cancel", accounts_path, class: "btn btn-secondary" %>
-  </div>
-<% end %>
+<%= render "accounts/form", account: @account %>

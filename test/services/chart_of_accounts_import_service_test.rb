@@ -7,6 +7,22 @@ class ChartOfAccountsImportServiceTest < ActiveSupport::TestCase
     ChartOfAccountsImportService.new(csv, organization: @org).call
   end
 
+  test "a re-import leaves what an expense account bills as alone" do
+    csv = <<~CSV
+      *Code,*Name,*Type,Description,*Tax Code
+      200,Sales,SALES,,Tax on Sales
+      400,Advertising,OVERHEADS,,Tax on Purchases
+    CSV
+    import(csv)
+    scope = Plutus::Account.where(tenant: @org)
+    scope.find_by(code: "400").update!(billing_income_account: scope.find_by(code: "200"))
+
+    result = import(csv.sub("Advertising", "Advertising and promotion"))
+    assert_empty result.errors
+    assert_equal "Advertising and promotion", scope.find_by(code: "400").name
+    assert_equal scope.find_by(code: "200"), scope.find_by(code: "400").billing_income_account
+  end
+
   test "imports a Xero-style CoA CSV mapping *Type to plutus subclasses" do
     csv = <<~CSV
       *Code,*Name,*Type,Description,*Tax Code

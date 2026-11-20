@@ -82,7 +82,7 @@
   (a customer); an invoice `LineItem` carries `rebills` (the cost it picked up). Billed is derived:
   `Document#billed_on` is the live invoice, draft included, holding such a line, and `unbilled` is
   the scope without one. `Billing::PickUp` builds the invoice lines (markup on the unit price, tax
-  and tracking copied, account from `OrganizationSettings#billable_income_account` or the cost's
+  and tracking copied, account from the cost account's pairing, else `OrganizationSettings#billable_income_account`, else the cost's
   own); `Contacts::BillableExpensesController` renders them as templates in a Turbo frame under the
   invoice form, and `billable_controller.js` hands a ticked cost's rows to the line-items controller.
   Reconcile's Create panel and `Memory` carry `billable_to` too, and a rule or memory suggestion's
@@ -104,6 +104,13 @@
   account (a bank account, a control account in Settings, a tax rate, a bank rule, a recurring
   invoice) and `archive!` refuses while anything does. Archiving a bank account archives its ledger
   account with it; the chart sends you to Banking for either direction.
+- An expense account can name the income account its costs are billed as (`BillingIncome`,
+  `billing_income_account`). `Billing::PickUp` reads it first, then
+  `OrganizationSettings#billable_income_account`, then the cost's own account. It is set on the
+  account's edit form (`AccountsController#edit`; type is never editable, a bank account's ledger
+  side is edited under Banking) or for many at once from the chart (ticks on the expense rows,
+  `Accounts::BillingIncomesController`). An income account others bill as can't be archived.
+  Importers never touch it.
 - Nothing new posts to an archived account: `RefusesArchivedAccount` on `LineItem` and `JournalLine`
   refuses a new line or a line moved onto one, and leaves existing lines alone. Importers
   (`Imports::BaseService` subclasses) run with `Current.importing` set and are let through.

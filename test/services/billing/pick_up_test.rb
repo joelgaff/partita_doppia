@@ -26,6 +26,30 @@ class BillingPickUpTest < ActiveSupport::TestCase
     @invoice = @org.documents.build(date: Date.current, contact: @northwind, documentable: Invoice.new(receivable_account: @ar))
   end
 
+  test "an expense account's own pairing wins, then Settings, then the cost's own account" do
+    reimbursed = Plutus::Revenue.create!(tenant: @org, name: "Reimbursed Expenses", code: "4030")
+    @meals.update!(billing_income_account: @sales)
+    @trip.reload
+
+    flight, dinner = Billing::PickUp.new(@org.documents.build(contact: @northwind, documentable: Invoice.new(receivable_account: @ar)), [ @trip ]).lines
+    assert_equal @travel, flight.account, "no pairing and nothing in Settings: its own account"
+    assert_equal @sales,  dinner.account
+
+    @org.settings.update!(billable_income_account: reimbursed)
+    flight, dinner = Billing::PickUp.new(@invoice, [ @trip ]).lines
+    assert_equal reimbursed, flight.account, "no pairing: the fallback in Settings"
+    assert_equal @sales,     dinner.account, "the pairing still wins"
+  end
+
+  test "a pairing whose income account has since been archived is passed over" do
+    @meals.update!(billing_income_account: @sales)
+    @sales.update_columns(archived_at: Time.current)
+    @org.settings.update!(billable_income_account: @billable)
+    @trip.reload
+    _flight, dinner = Billing::PickUp.new(@invoice, [ @trip ]).lines
+    assert_equal @billable, dinner.account
+  end
+
   test "one invoice line per expense line, marked up on the unit, tax and tracking carried, account from Settings" do
     @org.settings.update!(billable_income_account: @billable)
     lines = Billing::PickUp.new(@invoice, [ @trip ], markup: 10).lines
