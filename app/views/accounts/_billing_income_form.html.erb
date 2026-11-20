@@ -1,0 +1,14 @@
+<%# Under the expense accounts: what the ticked ones are billed as. The ticks live in the table and name this form. %>
+<% fallback = Current.organization.settings.billable_income_account %>
+<%= form_with url: accounts_billing_income_path, method: :patch, id: dom_id(Current.organization, :billing_income), class: "app-form filter-bar", style: "margin-top:12px;" do |f| %>
+  <%= f.hidden_field :q, value: @q, id: nil if @q.present? %>
+  <div class="field" style="flex:1 1 260px;">
+    <%= f.label :billing_income_account_id, "Bill the ticked accounts as" %>
+    <%= f.collection_select :billing_income_account_id, @income_accounts, :id, ->(a) { "#{a.code.present? ? "#{a.code} — " : ""}#{a.name}" },
+          { include_blank: "The fallback in Settings#{" (#{[ fallback.code, fallback.name ].compact_blank.join(' ')})" if fallback}" } %>
+  </div>
+  <%= f.submit "Apply to ticked accounts", class: "btn btn-secondary", name: nil, data: { checklist_target: "submit" } %>
+  <p class="muted" style="flex:1 1 100%;margin:0;font-size:12px;">
+    <span data-checklist-target="count">0</span> ticked. When a customer's invoice picks up a cost on one of these accounts, the line goes to this income account.
+  </p>
+<% end %>

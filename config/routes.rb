@@ -39,6 +39,9 @@ Rails.application.routes.draw do
     resources :notes,    only: :create, controller: "document_notes"
   end
   resources :payments, only: :destroy
+  namespace :accounts do
+    resource :billing_income, only: :update   # pair the ticked expense accounts with an income account
+  end
   resources :accounts, only: %i[index new create edit update] do
     member { post :archive; post :restore }
   end

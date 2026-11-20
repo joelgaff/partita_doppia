@@ -72,6 +72,7 @@ class AccountsController < ApplicationController
     accounts  = accounts.matching(@q) if @q.present?
     accounts  = accounts.to_a
     @archived = accounts.select(&:archived?)
+    load_income_accounts
     @grouped  = (accounts - @archived).group_by { |a| a.type.demodulize }.sort_by { |type, _| TYPES.index(type) || TYPES.size }
   end
 
