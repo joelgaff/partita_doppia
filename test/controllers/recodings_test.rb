@@ -119,6 +119,35 @@ class RecodingsTest < ActionDispatch::IntegrationTest
     assert_select "input[type=hidden][name='recoding[vendor_id]'][value=?]", hertz.id.to_s
   end
 
+  test "a type can be chosen: invoices only, or costs only, and it is carried into the apply" do
+    invoice = create_invoice(@org, contact: @ironman, amount: 80, receivable: @ar, revenue: @travel, date: Date.new(2026, 4, 7))
+
+    get new_recoding_path
+    assert_select "form[method=get] select[name=kind]" do
+      assert_select "option[value='']", text: "Any type"
+      assert_select "option[value=invoices]", text: "Invoices only"
+      assert_select "option[value=costs]", text: "Expenses and bills only"
+    end
+
+    get new_recoding_path(found(kind: "invoices"))
+    assert_select "select[name=kind] option[selected][value=invoices]"
+    assert_select "tbody tr", count: 1
+    assert_select "tbody a[href=?]", invoice_path(invoice)
+    assert_select "input[type=hidden][name='recoding[kind]'][value=invoices]"
+
+    get new_recoding_path(found(kind: "costs"))
+    assert_select "tbody tr", count: 1
+    assert_select "tbody a[href=?]", expense_path(@april)
+
+    apply(kind: "invoices", to_account_id: @reimb.id, line_keys: [ key(invoice), key(@april) ])
+    assert_equal "1 line moved from Travel to Reimbursable Expenses.", flash[:notice]
+    assert_equal @reimb,  invoice.reload.line_items.first.account
+    assert_equal @travel, @april.reload.line_items.first.account, "ticked, but not among what was found"
+
+    get new_recoding_path(found(kind: "invoices", from: "2025-01-01", to: "2025-01-31"))
+    assert_select ".empty-state", text: /Nothing on Travel among invoices/
+  end
+
   test "nothing found says so, with nothing to apply; a bad search explains itself" do
     get new_recoding_path(found(from: "2025-01-01", to: "2025-01-31", customer_id: @ironman.id))
     assert_select ".empty-state", text: /Nothing on Travel for IRONMAN/

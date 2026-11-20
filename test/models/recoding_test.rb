@@ -68,6 +68,14 @@ class RecodingTest < ActiveSupport::TestCase
     assert_equal [ @april ], r.lines.map(&:document)
   end
 
+  test "a kind narrows it to invoice lines, or to the costs: expenses and bills" do
+    invoice = create_invoice(@org, contact: @ironman, amount: 80, receivable: @ar, revenue: @travel, date: Date.new(2026, 4, 10))
+    assert_equal [ invoice ], recoding(kind: "invoices").lines.map(&:document)
+    assert_equal [ @march, @april, @bill ], recoding(kind: "costs").lines.map(&:document)
+    assert_equal 5, recoding(kind: "").lines.size, "anything: the journal too"
+    assert_not recoding(kind: "nonsense").valid?
+  end
+
   test "finding needs an account of this organisation, known people and sane dates" do
     assert_not Recoding.new(organization: @org).valid?
     elsewhere = Organization.create!(name: "Elsewhere")

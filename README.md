@@ -29,8 +29,8 @@ that worked and own the rest.
   after three agreeing codings, offer that on one tap too. Every match is
   undoable, and every document says in its history how it came to be.
 - **Find and recode**, the way Xero does it. From the chart of accounts or the
-  general ledger, find the lines coded to an account by dates, customer and
-  vendor, tick the ones you mean, then move them to another account, bill
+  general ledger, find the lines coded to an account by dates, customer,
+  vendor and type, tick the ones you mean, then move them to another account, bill
   them to a customer, or both. A moved transaction posts again as if it had
   been coded that way from the start; either change is noted in its history.
 - **Tracking categories** the way Xero does them: up to two active categories,

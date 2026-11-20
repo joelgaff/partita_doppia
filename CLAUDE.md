@@ -118,7 +118,7 @@
 - Find and recode is `Recoding` (a form object; `RecodingsController`, reached from the chart and
   the general ledger). It finds every `LineItem` and `JournalLine` on one account, on live
   documents, narrowed by dates, customer (`Document.for_customer`, or `without_customer` for
-  "No customer yet") and vendor. The GET page lists them with a tick each (`checklist` Stimulus
+  "No customer yet"), vendor and kind (invoices only, or expenses and bills only). The GET page lists them with a tick each (`checklist` Stimulus
   controller); the POST applies to the ticked ones, all or nothing, either or both of: move to
   another account (each document reposts and gets a `reclassified` history line) and bill to a
   customer (the document's `billable_to`, a `billable_changed` history line; only expenses and

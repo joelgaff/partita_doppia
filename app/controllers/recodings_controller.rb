@@ -2,7 +2,7 @@
 # finds is the form that does something to the ticked ones. Only that second
 # form changes anything.
 class RecodingsController < ApplicationController
-  FIND = %i[account_id from to customer_id vendor_id].freeze
+  FIND = %i[account_id from to customer_id vendor_id kind].freeze
 
   before_action :load_choices
 
