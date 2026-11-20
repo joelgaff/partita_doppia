@@ -31,6 +31,9 @@ module AccountArchiving
     if (settings = tenant&.settings) && [ settings.receivable_account_id, settings.payable_account_id, settings.billable_income_account_id ].include?(id)
       return "is a control account; choose another under Settings first"
     end
+    if (paired = billed_from_accounts.active.order(:code, :name).pluck(:name)).any?
+      return "is where #{paired.to_sentence} #{paired.one? ? 'bills its' : 'bill their'} income; change that on the chart first"
+    end
     if (rate = TaxRate.where(organization_id: tenant_id).where("liability_account_id = :id OR asset_account_id = :id", id: id).first)
       return "is the account for tax rate #{rate.name}"
     end
