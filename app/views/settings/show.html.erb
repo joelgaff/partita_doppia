@@ -137,7 +137,7 @@
         <div class="settings-row-label"><%= f.label :billable_income_account_id, "Billable expenses income" %></div>
         <div class="settings-row-main">
           <%= f.collection_select :billable_income_account_id, @revenue_accounts, :id, ->(a) { "#{a.code.present? ? "#{a.code} — " : ""}#{a.name}" }, include_blank: "— each expense's own account —" %>
-          <p class="settings-row-help">An expense flagged as billable and picked up on an invoice goes to this account, markup included. Blank: the invoice line keeps the expense's own account.</p>
+          <p class="settings-row-help">An expense flagged as billable and picked up on an invoice goes to this account, markup included, unless its expense account names another on the <%= link_to "chart of accounts", accounts_path %>. Blank: the invoice line keeps the expense's own account.</p>
         </div>
         <div class="settings-row-action"><%= f.submit "Save account", class: "btn btn-primary" %></div>
       <% end %>

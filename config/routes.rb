@@ -39,7 +39,7 @@ Rails.application.routes.draw do
     resources :notes,    only: :create, controller: "document_notes"
   end
   resources :payments, only: :destroy
-  resources :accounts, only: %i[index new create] do
+  resources :accounts, only: %i[index new create edit update] do
     member { post :archive; post :restore }
   end
   resource :recoding, only: %i[new create]

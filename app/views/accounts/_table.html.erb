@@ -15,6 +15,9 @@
         <td data-label="Code"><%= account.code || content_tag(:span, "—", class: "muted") %></td>
         <td data-label="Name">
           <%= link_to account.name, reports_general_ledger_path(account_id: account.id), title: "Open #{account.name} in the general ledger" %>
+          <% if account.billing_income_account %>
+            <span class="muted chart-billed-as">bills as <%= [ account.billing_income_account.code, account.billing_income_account.name ].compact_blank.join(" ") %></span>
+          <% end %>
           <% if account.bank_account %>
             <%= link_to account.bank_account.kind_label, edit_bank_account_path(account.bank_account), class: "badge badge-open", style: "margin-left:6px;text-decoration:none;" %>
           <% end %>
@@ -26,8 +29,10 @@
           <% if account.bank_account %>
             <%# A bank account's ledger side is archived and restored from Banking, through the badge beside its name. %>
           <% elsif account.archived? %>
+            <%= link_to "Edit", edit_account_path(account), class: "btn btn-secondary" %>
             <%= button_to "Restore", restore_account_path(account), params: { q: @q.presence }.compact, class: "btn btn-secondary", form: { class: "inline-form", data: { turbo_stream: true } } %>
           <% else %>
+            <%= link_to "Edit", edit_account_path(account), class: "btn btn-secondary" %>
             <%= button_to "Archive", archive_account_path(account), params: { q: @q.presence }.compact, class: "btn btn-secondary", form: { class: "inline-form", data: { turbo_stream: true } } %>
           <% end %>
         </td>

@@ -1,0 +1,6 @@
+<% content_for :title, "Edit #{@account.name_was}" %>
+<header class="page-header">
+  <h1>Edit <%= @account.name_was %></h1>
+</header>
+
+<%= render "accounts/form", account: @account %>
