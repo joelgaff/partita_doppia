@@ -44,7 +44,9 @@ that worked and own the rest.
 - **Billable expenses**, the way Xero does them: flag an expense or bill as
   billable to a customer, and their next invoice offers it under the lines,
   marked up if you like, with tax and tracking carried across. The cost stays
-  an expense at its real price; the invoice line is revenue. In reconcile, a
+  an expense at its real price; the invoice line is revenue, in the income
+  account you pair with the expense account on the chart (reimbursements one
+  place, resale another), or one fallback for the rest. In reconcile, a
   suggested expense has a Bill to field beside its OK, filled in with the
   customer the payee was billed to last time; change it or clear it for this
   line.
